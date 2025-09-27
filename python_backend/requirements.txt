@@ -4,14 +4,16 @@ python-multipart==0.0.6
 supabase==2.0.2
 langchain==0.1.4
 langchain-community==0.0.13
-langchain-groq==0.0.3
+# langchain-groq==0.0.3 im assuming this is a typo
+langchain-groq==0.3.0
 langchain-huggingface==0.0.1
 langgraph==0.0.26
 chromadb==0.4.22
 pypdf2==3.0.1
 python-docx==1.1.0
 python-dotenv==1.0.0
-dateutil==2.8.2
+#dateutil==2.8.2 # this also doesn't exist
+dateutil==0.6.12 
 requests==2.31.0
 pydantic==2.5.2
 typing-extensions==4.8.0
