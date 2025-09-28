@@ -12,8 +12,8 @@ chromadb==0.4.22
 pypdf2==3.0.1
 python-docx==1.1.0
 python-dotenv==1.0.0
-#dateutil==2.8.2 # this also doesn't exist
-dateutil==0.6.12 
+#dateutil==2.8.2 # this also doesn't exist um is it python-dateutil? or dateutils with an s im going to assume the dateutils with the an s
+dateutils==0.6.12
 requests==2.31.0
 pydantic==2.5.2
 typing-extensions==4.8.0
