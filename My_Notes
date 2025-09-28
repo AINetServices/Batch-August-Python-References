@@ -1,1 +1,5 @@
 Could not find langchain-grok during pip install requirements
+Lot of problems with requirements, decided to install the latest and change dateutils
+updated references in in sql to SOURCE_REFERENCES (because references is a keyword?)
+rls is enabled in the sql code itself 
+is this all made by ai?
