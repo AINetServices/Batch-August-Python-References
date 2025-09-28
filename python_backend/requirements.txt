@@ -3,7 +3,8 @@ uvicorn==0.24.0
 python-multipart==0.0.6
 supabase==2.0.2
 langchain==0.1.4
-langchain-community==0.0.13
+#langchain-community==0.0.13 #dependency issue going to go up by 1 version
+langchain-community==0.0.14
 # langchain-groq==0.0.3 im assuming this is a typo
 langchain-groq==0.3.0
 langchain-huggingface==0.0.1
