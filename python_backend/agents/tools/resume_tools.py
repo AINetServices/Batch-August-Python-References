@@ -16,7 +16,8 @@ class ResumeParserTool(BaseTool):
     
     name: str = "resume_parser"
     description: str = "Parse resume files and extract text content"
-    
+    llm: ChatGroq
+
     def __init__(self, llm: ChatGroq):
         super().__init__()
         self.llm = llm
@@ -84,7 +85,8 @@ class ReferenceExtractorTool(BaseTool):
     
     name: str = "reference_extractor"
     description: str = "Extract reference contacts and professional relationships from resume text"
-    
+    llm: ChatGroq
+
     def __init__(self, llm: ChatGroq):
         super().__init__()
         self.llm = llm
@@ -177,6 +179,7 @@ class ResumeAnalyzerTool(BaseTool):
     
     name: str = "resume_analyzer"
     description: str = "Analyze resume content for skills, experience, and professional background"
+    llm: ChatGroq
     
     def __init__(self, llm: ChatGroq):
         super().__init__()

@@ -84,7 +84,7 @@ class ReferenceExtractorTool(BaseTool):
     
     name = "reference_extractor"
     description = "Extract reference contacts and professional relationships from resume text"
-    
+
     def __init__(self, llm: ChatGroq):
         super().__init__()
         self.llm = llm
