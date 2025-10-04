@@ -14,8 +14,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 class VectorStoreTool(BaseTool):
     """Tool for creating and managing vector stores for semantic search"""
     
-    name = "vector_store"
-    description = "Create and query vector stores for semantic document search"
+    name: str = "vector_store"
+    description: str = "Create and query vector stores for semantic document search"
     
     def __init__(self, embeddings: HuggingFaceEmbeddings):
         super().__init__()
@@ -163,8 +163,8 @@ class VectorStoreTool(BaseTool):
 class SemanticSearchTool(BaseTool):
     """Advanced tool for semantic search and information retrieval"""
     
-    name = "semantic_search"
-    description = "Perform advanced semantic search and information retrieval from documents"
+    name: str = "semantic_search"
+    description: str = "Perform advanced semantic search and information retrieval from documents"
     
     def __init__(self, embeddings: HuggingFaceEmbeddings):
         super().__init__()

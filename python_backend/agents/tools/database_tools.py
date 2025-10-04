@@ -12,8 +12,8 @@ from pydantic import BaseModel
 class QuestionFetcherTool(BaseTool):
     """Tool for fetching predefined questions from Supabase database"""
     
-    name = "question_fetcher"
-    description = "Fetch predefined reference questions based on role and organization"
+    name: str = "question_fetcher"
+    description: str = "Fetch predefined reference questions based on role and organization"
     
     def __init__(self):
         super().__init__()
@@ -96,8 +96,8 @@ class QuestionFetcherTool(BaseTool):
 class DatabaseUpdateTool(BaseTool):
     """Tool for updating application and reference data in Supabase"""
     
-    name = "database_updater"
-    description = "Update application status and reference information in the database"
+    name: str = "database_updater"
+    description: str = "Update application status and reference information in the database"
     
     def __init__(self):
         super().__init__()
