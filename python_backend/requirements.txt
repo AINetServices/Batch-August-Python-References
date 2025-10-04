@@ -2,3 +2,10 @@ fastapi
 uvicorn
 dotenv
 requests
+langgraph>=0.6.8
+langchain-groq
+langchain-community
+langchain-chroma
+langchain-text-splitters
+langchain-core
+langchain-huggingface
