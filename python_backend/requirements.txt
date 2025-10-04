@@ -17,21 +17,48 @@
 # pydantic
 # typing-extensions
 
-# starting again 
+# starting again pydantic error with the latest one
+setuptools
+Cython
+langchain-groq
+langchain-community
+langchain
+langchain-core    # moving all the langchiains to the start 
+
+
 fastapi==0.104.1
 uvicorn==0.24.0
 python-multipart==0.0.6
 supabase==2.0.2
-langchain==0.1.4
-langchain-community==0.0.13
-langchain-groq==0.0.3
+#langchain==0.1.4
+#langchain-community==0.0.13 # dependency issue langchain needs at least 0.0.14
+#langchain-community==0.0.14
+#langchain-groq==0.0.3 # this doesn't exist
+#langchain-groq==0.3.0
 langchain-huggingface==0.0.1
 langgraph==0.0.26
 chromadb==0.4.22
 pypdf2==3.0.1
 python-docx==1.1.0
 python-dotenv==1.0.0
-dateutil==2.8.2
+# dateutil==2.8.2 missing s?
+# dateutils==2.8.2 nope not just the s, only the python-dateutil has 2.8.2 
+python-dateutil==2.8.2
 requests==2.31.0
 pydantic==2.5.2
 typing-extensions==4.8.0
+# for some reason this wasn't included in the requirements: Langchain core:
+#langchain-core==0.1.16
+# The conflict is caused by:
+#     langchain 0.1.4 depends on langchain-core<0.2 and >=0.1.16
+#     langchain-community 0.0.14 depends on langchain-core<0.2 and >=0.1.14       
+#     langchain-groq 0.3.0 depends on langchain-core<1.0.0 and >=0.3.45
+# langchain-groq
+# langchain-community
+# langchain
+# langchain-core    
+# moving on lets just get the latest of all 4 of these maybe that will fix it?
+               
+# ok now cython might be missing so lets add that
+# cython 
+# didn't work so manually install now # maybe try putting it at the start
