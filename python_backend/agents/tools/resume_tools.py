@@ -14,8 +14,8 @@ from pydantic import BaseModel
 class ResumeParserTool(BaseTool):
     """Tool for parsing resume files (PDF, DOCX) and extracting text"""
     
-    name = "resume_parser"
-    description = "Parse resume files and extract text content"
+    name: str = "resume_parser"
+    description: str = "Parse resume files and extract text content"
     
     def __init__(self, llm: ChatGroq):
         super().__init__()
@@ -82,8 +82,8 @@ class ResumeParserTool(BaseTool):
 class ReferenceExtractorTool(BaseTool):
     """Tool for extracting reference information from resume text"""
     
-    name = "reference_extractor"
-    description = "Extract reference contacts and professional relationships from resume text"
+    name: str = "reference_extractor"
+    description: str = "Extract reference contacts and professional relationships from resume text"
     
     def __init__(self, llm: ChatGroq):
         super().__init__()
@@ -175,8 +175,8 @@ class ReferenceExtractorTool(BaseTool):
 class ResumeAnalyzerTool(BaseTool):
     """Advanced tool for analyzing resume content and extracting insights"""
     
-    name = "resume_analyzer"
-    description = "Analyze resume content for skills, experience, and professional background"
+    name: str = "resume_analyzer"
+    description: str = "Analyze resume content for skills, experience, and professional background"
     
     def __init__(self, llm: ChatGroq):
         super().__init__()
@@ -194,7 +194,7 @@ class ResumeAnalyzerTool(BaseTool):
             Analyze and extract:
 
             1. APPLICANT PROFILE:
-               - Full name
+               - Full   
                - Contact information
                - Current position/title
                - Years of experience
