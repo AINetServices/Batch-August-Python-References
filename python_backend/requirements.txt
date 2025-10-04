@@ -12,3 +12,4 @@ langchain-huggingface
 PyPDF2
 python-docx
 supabase
+sentence-transformers
