@@ -18,8 +18,8 @@ class QuestionFetcherTool(BaseTool):
     def __init__(self):
         super().__init__()
         self.supabase: Client = create_client(
-            os.getenv("SUPABASE_URL"),
-            os.getenv("SUPABASE_SERVICE_KEY")
+            os.getenv("VITE_SUPABASE_URL"),
+            os.getenv("VITE_SUPABASE_ANON_KEY")
         )
 
     def _run(self, role: str, organization: str) -> List[str]:
