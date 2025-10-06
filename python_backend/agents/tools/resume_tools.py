@@ -16,11 +16,11 @@ class ResumeParserTool(BaseTool):
     
     name: str = "resume_parser"
     description: str = "Parse resume files and extract text content"
-    llm: ChatGroq
+    llm: ChatGroq #removed initi
 
-    def __init__(self, llm: ChatGroq):
-        super().__init__()
-        self.llm = llm
+    # def __init__(self, llm: ChatGroq): # apparently pydantic will create this init automatically and do the llm: ChatGroq so associate itself with the above variable by itself?
+    #     super().__init__()
+    #     self.llm = llm
 
     def _run(self, file_path: str) -> str:
         """Parse a resume file and return extracted text"""
@@ -87,9 +87,9 @@ class ReferenceExtractorTool(BaseTool):
     description: str = "Extract reference contacts and professional relationships from resume text"
     llm: ChatGroq
 
-    def __init__(self, llm: ChatGroq):
-        super().__init__()
-        self.llm = llm
+    # def __init__(self, llm: ChatGroq):
+    #     super().__init__()
+    #     self.llm = llm
 
     def _run(self, resume_text: str, role: str = "") -> Dict[str, Any]:
         """Extract references from resume text"""
