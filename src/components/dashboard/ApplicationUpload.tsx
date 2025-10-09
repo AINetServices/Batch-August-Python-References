@@ -21,9 +21,15 @@ export function ApplicationUpload({ onComplete }: ApplicationUploadProps) {
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
+<<<<<<< HEAD
     if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true)
     } else if (e.type === 'dragleave') {
+=======
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true)
+    } else if (e.type === "dragleave") {
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
       setDragActive(false)
     }
   }
@@ -32,11 +38,18 @@ export function ApplicationUpload({ onComplete }: ApplicationUploadProps) {
     e.preventDefault()
     e.stopPropagation()
     setDragActive(false)
+<<<<<<< HEAD
 
     const droppedFile = e.dataTransfer.files[0]
     if (droppedFile && (droppedFile.type === 'application/pdf' || droppedFile.type.includes('document'))) {
       setFile(droppedFile)
       setError('')
+=======
+    
+    const droppedFile = e.dataTransfer.files[0]
+    if (droppedFile && (droppedFile.type === 'application/pdf' || droppedFile.type.includes('document'))) {
+      setFile(droppedFile)
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
     } else {
       setError('Please upload a PDF or document file')
     }
@@ -70,6 +83,7 @@ export function ApplicationUpload({ onComplete }: ApplicationUploadProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+<<<<<<< HEAD
 
     if (!validateForm()) {
       return
@@ -78,10 +92,17 @@ export function ApplicationUpload({ onComplete }: ApplicationUploadProps) {
     if (!file || !user) {
       return
     }
+=======
+    
+    // Validate required fields
+    if (!validateForm()) return
+    if (!file || !user) return
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
 
     setLoading(true)
     setError('')
 
+<<<<<<< HEAD
     try {
       // Step 1: Upload file to Supabase Storage
       const fileExt = file.name.split('.').pop()
@@ -97,14 +118,38 @@ export function ApplicationUpload({ onComplete }: ApplicationUploadProps) {
       }
 
       // Step 2: Get public URL
+=======
+    // Debug log
+    console.log('Starting submission with:', { user: user?.id, roleName, orgName, file: file?.name });
+
+    try {
+      // Upload file to Supabase Storage first
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('resumes')
+        .upload(fileName, file)
+
+      if (uploadError) throw uploadError
+
+      // Get public URL
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
       const { data: urlData } = supabase.storage
         .from('resumes')
         .getPublicUrl(fileName)
 
+<<<<<<< HEAD
       console.log('✅ File uploaded, URL:', urlData.publicUrl)
 
       // Step 3: Create application in database
       console.log('📝 Creating application in database...')
+=======
+      // Debug log
+      console.log('File uploaded successfully:', urlData.publicUrl);
+
+      // Use a database function to handle the complex insert
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
       const { data, error: dbError } = await supabase.rpc('create_application_with_org', {
         p_user_id: user.id,
         p_resume_url: urlData.publicUrl,
@@ -113,6 +158,7 @@ export function ApplicationUpload({ onComplete }: ApplicationUploadProps) {
         p_status: 'processing'
       })
 
+<<<<<<< HEAD
       if (dbError) {
         throw dbError
       }
@@ -161,6 +207,46 @@ export function ApplicationUpload({ onComplete }: ApplicationUploadProps) {
 
     } catch (err: any) {
       console.error('❌ Upload error:', err)
+=======
+      // Debug log
+      console.log('Database function response:', { data, error: dbError });
+
+      if (dbError) throw dbError
+
+      // OPTIONAL: Try to call Python backend, but don't fail if it's not set up
+      try {
+        const processResponse = await fetch('/api/process-resume', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            resume_url: urlData.publicUrl,
+            role_name: roleName.trim(),
+            organization_name: orgName.trim(),
+            user_id: user.id,
+            application_id: data.application_id
+          })
+        })
+
+        if (processResponse.ok) {
+          const processData = await processResponse.json()
+          console.log('Resume processed:', processData)
+          console.log('API call completed successfully');
+        } else {
+          console.warn('API call returned non-OK status (backend may not be set up):', processResponse.status);
+          // This is OK! Continue without throwing an error
+        }
+      } catch (apiError) {
+        console.warn('API call failed (backend not set up yet):', apiError);
+        // This is OK! Continue without throwing an error
+      }
+
+      onComplete()
+    } catch (err: any) {
+      // Debug log
+      console.error('Error details:', err);
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
       setError(err.message || 'Failed to upload application')
     } finally {
       setLoading(false)
@@ -207,7 +293,11 @@ export function ApplicationUpload({ onComplete }: ApplicationUploadProps) {
               accept=".pdf,.doc,.docx"
               onChange={handleFileSelect}
             />
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
             {file ? (
               <div className="flex items-center justify-between">
                 <div className="flex items-center">

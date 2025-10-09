@@ -13,6 +13,10 @@ from io import BytesIO
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import create_react_agent
 from langchain_groq import ChatGroq
+<<<<<<< HEAD
+=======
+from langchain_huggingface import HuggingFaceEmbeddings
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
 from langchain_community.vectorstores import Chroma
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -42,6 +46,7 @@ class ReferenceCheckingWorkflow:
     Multi-agent workflow orchestrator using LangGraph.
     Manages the complete pipeline from resume processing to reference extraction.
     """
+<<<<<<< HEAD
 
     def __init__(self):  # ← FIXED: Proper indentation
         self.llm = ChatGroq(
@@ -51,22 +56,43 @@ class ReferenceCheckingWorkflow:
         
         # Use a simpler embedding approach - we'll skip embeddings for now to avoid the import issue
         self.embeddings = None  # We'll handle this differently
+=======
+    
+    def __init__(self):
+        self.llm = ChatGroq(
+            model="llama3-70b-8192",
+            api_key=os.getenv("GROQ_API_KEY")
+        )
+        self.embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en")
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
         
         # Initialize tools
         self.resume_parser = ResumeParserTool(llm=self.llm)
         self.reference_extractor = ReferenceExtractorTool(llm=self.llm)
         self.question_fetcher = QuestionFetcherTool()
+<<<<<<< HEAD
         self.vector_tool = VectorStoreTool()
 
+=======
+        self.vector_tool = VectorStoreTool(embeddings=self.embeddings)
+        
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
         # Build the workflow graph
         self.workflow = self._build_workflow()
 
     def _build_workflow(self) -> StateGraph:
         """Build the multi-agent workflow using LangGraph"""
+<<<<<<< HEAD
 
         # Create the state graph
         workflow = StateGraph(WorkflowState)
 
+=======
+        
+        # Create the state graph
+        workflow = StateGraph(WorkflowState)
+        
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
         # Add nodes
         workflow.add_node("download_resume", self._download_resume_node)
         workflow.add_node("parse_resume", self._parse_resume_node)
@@ -75,7 +101,11 @@ class ReferenceCheckingWorkflow:
         workflow.add_node("build_vectorstore", self._build_vectorstore_node)
         workflow.add_node("fetch_questions", self._fetch_questions_node)
         workflow.add_node("finalize", self._finalize_node)
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
         # Add edges to define the flow
         workflow.add_edge("download_resume", "parse_resume")
         workflow.add_edge("parse_resume", "extract_applicant")
@@ -84,15 +114,23 @@ class ReferenceCheckingWorkflow:
         workflow.add_edge("build_vectorstore", "fetch_questions")
         workflow.add_edge("fetch_questions", "finalize")
         workflow.add_edge("finalize", END)
+<<<<<<< HEAD
 
         # Set entry point
         workflow.set_entry_point("download_resume")
 
+=======
+        
+        # Set entry point
+        workflow.set_entry_point("download_resume")
+        
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
         return workflow.compile()
 
     async def _download_resume_node(self, state: WorkflowState) -> WorkflowState:
         """Download and extract text from resume URL"""
         try:
+<<<<<<< HEAD
             print(f"📥 Downloading resume from: {state['resume_url']}")
             response = requests.get(state["resume_url"])
             response.raise_for_status()
@@ -127,6 +165,24 @@ class ReferenceCheckingWorkflow:
             state["error_message"] = error_msg
             state["status"] = "error"
 
+=======
+            response = requests.get(state["resume_url"])
+            response.raise_for_status()
+            
+            # Use resume parser to extract text
+            resume_text = self.resume_parser.parse_file_content(
+                BytesIO(response.content), 
+                state["resume_url"]
+            )
+            
+            state["resume_text"] = resume_text
+            state["status"] = "downloaded"
+            
+        except Exception as e:
+            state["error_message"] = f"Failed to download resume: {str(e)}"
+            state["status"] = "error"
+            
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
         return state
 
     async def _parse_resume_node(self, state: WorkflowState) -> WorkflowState:
@@ -134,13 +190,18 @@ class ReferenceCheckingWorkflow:
         try:
             if state["status"] == "error":
                 return state
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
             # Split text into manageable chunks
             text_splitter = RecursiveCharacterTextSplitter(
                 chunk_size=1000,
                 chunk_overlap=200,
                 separators=["\n\n", "\n", ". ", " "]
             )
+<<<<<<< HEAD
 
             chunks = text_splitter.split_text(state["resume_text"])
             state["resume_chunks"] = chunks
@@ -151,6 +212,17 @@ class ReferenceCheckingWorkflow:
             state["error_message"] = f"Failed to parse resume: {str(e)}"
             state["status"] = "error"
 
+=======
+            
+            chunks = text_splitter.split_text(state["resume_text"])
+            state["resume_chunks"] = chunks
+            state["status"] = "parsed"
+            
+        except Exception as e:
+            state["error_message"] = f"Failed to parse resume: {str(e)}"
+            state["status"] = "error"
+            
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
         return state
 
     async def _extract_applicant_node(self, state: WorkflowState) -> WorkflowState:
@@ -158,6 +230,7 @@ class ReferenceCheckingWorkflow:
         try:
             if state["status"] == "error":
                 return state
+<<<<<<< HEAD
 
             # Use direct LLM call instead of agent to avoid empty messages issue
             applicant_info = await self._extract_applicant_info_direct(state["resume_text"])
@@ -178,6 +251,27 @@ class ReferenceCheckingWorkflow:
             }
             state["status"] = "applicant_extracted"
 
+=======
+                
+            # Create specialized agent for applicant extraction
+            applicant_agent = self._create_applicant_agent()
+            
+            # Extract applicant information
+            result = applicant_agent.invoke({
+                "input": f"Extract applicant information from this resume: {state['resume_text'][:2000]}...",
+                "resume_text": state["resume_text"]
+            })
+            
+            # Parse the result
+            applicant_info = self._parse_applicant_info(result["output"])
+            state["applicant_info"] = applicant_info
+            state["status"] = "applicant_extracted"
+            
+        except Exception as e:
+            state["error_message"] = f"Failed to extract applicant info: {str(e)}"
+            state["status"] = "error"
+            
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
         return state
 
     async def _extract_references_node(self, state: WorkflowState) -> WorkflowState:
@@ -185,6 +279,7 @@ class ReferenceCheckingWorkflow:
         try:
             if state["status"] == "error":
                 return state
+<<<<<<< HEAD
 
             # Use direct LLM call instead of agent to avoid empty messages issue
             references = await self._extract_references_direct(state["resume_text"], state["role"])
@@ -226,6 +321,57 @@ class ReferenceCheckingWorkflow:
             state["vectorstore_path"] = ""
             state["status"] = "vectorstore_built"
 
+=======
+                
+            # Create specialized agent for reference extraction
+            reference_agent = self._create_reference_agent()
+            
+            # Extract references
+            result = reference_agent.invoke({
+                "input": f"Extract reference contacts from this resume for {state['role']} position",
+                "resume_text": state["resume_text"],
+                "role": state["role"]
+            })
+            
+            # Parse references
+            references = self._parse_references(result["output"])
+            state["references"] = references
+            state["status"] = "references_extracted"
+            
+        except Exception as e:
+            state["error_message"] = f"Failed to extract references: {str(e)}"
+            state["status"] = "error"
+            
+        return state
+
+    async def _build_vectorstore_node(self, state: WorkflowState) -> WorkflowState:
+        """Build vector store for semantic search"""
+        try:
+            if state["status"] == "error":
+                return state
+                
+            # Create documents from resume chunks
+            documents = [Document(page_content=chunk) for chunk in state.get("resume_chunks", [])]
+            
+            # Build vector store
+            vectorstore_path = f"./vectorstore/{state['role']}_{state['organization']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            
+            if documents:
+                vectorstore = Chroma.from_documents(
+                    documents,
+                    self.embeddings,
+                    persist_directory=vectorstore_path
+                )
+                vectorstore.persist()
+                
+            state["vectorstore_path"] = vectorstore_path
+            state["status"] = "vectorstore_built"
+            
+        except Exception as e:
+            state["error_message"] = f"Failed to build vectorstore: {str(e)}"
+            state["status"] = "error"
+            
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
         return state
 
     async def _fetch_questions_node(self, state: WorkflowState) -> WorkflowState:
@@ -233,6 +379,7 @@ class ReferenceCheckingWorkflow:
         try:
             if state["status"] == "error":
                 return state
+<<<<<<< HEAD
 
             # Fetch questions from database
             questions = await self.question_fetcher.get_questions(
@@ -250,6 +397,22 @@ class ReferenceCheckingWorkflow:
             state["questions"] = []
             state["status"] = "questions_fetched"
 
+=======
+                
+            # Fetch questions from database
+            questions = await self.question_fetcher.get_questions(
+                state["role"], 
+                state["organization"]
+            )
+            
+            state["questions"] = questions
+            state["status"] = "questions_fetched"
+            
+        except Exception as e:
+            state["error_message"] = f"Failed to fetch questions: {str(e)}"
+            state["status"] = "error"
+            
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
         return state
 
     async def _finalize_node(self, state: WorkflowState) -> WorkflowState:
@@ -257,6 +420,7 @@ class ReferenceCheckingWorkflow:
         try:
             if state["status"] == "error":
                 return state
+<<<<<<< HEAD
 
             state["status"] = "completed"
             print("✅ Workflow completed successfully")
@@ -387,6 +551,80 @@ class ReferenceCheckingWorkflow:
         except Exception as e:
             print(f"❌ Direct reference extraction failed: {e}")
             return []
+=======
+                
+            state["status"] = "completed"
+            
+        except Exception as e:
+            state["error_message"] = f"Failed to finalize: {str(e)}"
+            state["status"] = "error"
+            
+        return state
+
+    def _create_applicant_agent(self) -> AgentExecutor:
+        """Create specialized agent for extracting applicant information"""
+        
+        @tool
+        def extract_applicant_info(resume_text: str) -> str:
+            """Extract applicant name, contact info, and basic details from resume"""
+            prompt = PromptTemplate.from_template("""
+            Extract the following applicant information from this resume text:
+            
+            Resume Text:
+            {resume_text}
+            
+            Extract and return as JSON:
+            - full_name: The applicant's full name
+            - email: Email address
+            - phone: Phone number
+            - current_position: Current job title/position
+            - experience_years: Estimated years of experience
+            - key_skills: List of main skills/competencies
+            
+            Return only the JSON object:
+            """)
+            
+            result = self.llm.invoke(prompt.format(resume_text=resume_text))
+            return result.content
+        
+        tools = [extract_applicant_info]
+        return create_react_agent(self.llm, tools)
+
+    def _create_reference_agent(self) -> AgentExecutor:
+        """Create specialized agent for extracting reference information"""
+        
+        @tool
+        def extract_references(resume_text: str, role: str) -> str:
+            """Extract reference contacts from resume text"""
+            prompt = PromptTemplate.from_template("""
+            Extract reference information from this resume for a {role} position:
+            
+            Resume Text:
+            {resume_text}
+            
+            Look for:
+            - Previous supervisors, managers, or colleagues
+            - Contact information (email, phone)
+            - Company/organization names
+            - Working relationship and duration
+            
+            Return as JSON array with objects containing:
+            - name: Reference's full name
+            - email: Email address (if available)
+            - company: Company/organization
+            - relationship: Professional relationship (e.g., "Direct supervisor", "Colleague")
+            - years_worked: Duration worked together
+            - context: Brief context of their working relationship
+            
+            Return only the JSON array:
+            """)
+            
+            result = self.llm.invoke(prompt.format(resume_text=resume_text, role=role))
+            return result.content
+        
+        tools = [extract_references]
+        return create_react_agent(self.llm, tools)
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
 
     def _parse_applicant_info(self, llm_output: str) -> Dict[str, Any]:
         """Parse LLM output into structured applicant information"""
@@ -394,7 +632,11 @@ class ReferenceCheckingWorkflow:
             # Try to extract JSON from the output
             start_idx = llm_output.find('{')
             end_idx = llm_output.rfind('}') + 1
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
             if start_idx >= 0 and end_idx > start_idx:
                 json_str = llm_output[start_idx:end_idx]
                 return json.loads(json_str)
@@ -414,6 +656,7 @@ class ReferenceCheckingWorkflow:
     def _parse_references(self, llm_output: str) -> List[Dict[str, Any]]:
         """Parse LLM output into structured reference information"""
         try:
+<<<<<<< HEAD
             # Handle empty or None output
             if not llm_output or llm_output.strip() == "":
                 print("⚠️ No references found in resume - returning empty list")
@@ -427,6 +670,16 @@ class ReferenceCheckingWorkflow:
                 json_str = llm_output[start_idx:end_idx]
                 references = json.loads(json_str)
 
+=======
+            # Try to extract JSON from the output
+            start_idx = llm_output.find('[')
+            end_idx = llm_output.rfind(']') + 1
+            
+            if start_idx >= 0 and end_idx > start_idx:
+                json_str = llm_output[start_idx:end_idx]
+                references = json.loads(json_str)
+                
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
                 # Validate and clean references
                 cleaned_refs = []
                 for ref in references:
@@ -439,6 +692,7 @@ class ReferenceCheckingWorkflow:
                             "years_worked": ref.get("years_worked", "Unknown"),
                             "context": ref.get("context", "")
                         })
+<<<<<<< HEAD
 
                 print(f"✅ Found {len(cleaned_refs)} references")
                 return cleaned_refs
@@ -464,12 +718,20 @@ class ReferenceCheckingWorkflow:
             return []
         except Exception as e:
             print(f"❌ Unexpected error parsing references: {e}")
+=======
+                
+                return cleaned_refs
+            else:
+                return []
+        except json.JSONDecodeError:
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
             return []
 
     async def run_workflow(self, resume_url: str, role: str, organization: str) -> Dict[str, Any]:
         """
         Run the complete multi-agent workflow
         """
+<<<<<<< HEAD
         print(f"🎯 Workflow started for {role} at {organization}")
         
         try:
@@ -523,3 +785,30 @@ class ReferenceCheckingWorkflow:
                 "status": "error", 
                 "error_message": f"Workflow execution failed: {str(e)}"
             }
+=======
+        initial_state = WorkflowState(
+            resume_url=resume_url,
+            role=role,
+            organization=organization,
+            resume_text="",
+            applicant_info={},
+            references=[],
+            questions=[],
+            vectorstore_path="",
+            error_message="",
+            status="initialized"
+        )
+        
+        # Execute the workflow
+        final_state = await self.workflow.ainvoke(initial_state)
+        
+        # Return the results
+        return {
+            "applicant_info": final_state.get("applicant_info", {}),
+            "references": final_state.get("references", []),
+            "questions": final_state.get("questions", []),
+            "vectorstore_path": final_state.get("vectorstore_path", ""),
+            "status": final_state.get("status", "unknown"),
+            "error_message": final_state.get("error_message", "")
+        }
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517

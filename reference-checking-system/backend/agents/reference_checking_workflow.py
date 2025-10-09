@@ -35,7 +35,10 @@ class WorkflowState(TypedDict):
     references: List[Dict[str, Any]]
     questions: List[str]
     vectorstore_path: str
+<<<<<<< HEAD
     email_results: Dict[str, Any]
+=======
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
     error_message: str
     status: str
 
@@ -339,4 +342,65 @@ class ReferenceCheckingWorkflow:
             return {"error": "Failed to parse applicant information"}
 
     def _parse_references(self, llm_output: str) -> List[Dict[str, Any]]:
+<<<<<<< HEAD
         """Parse LLM output into
+=======
+        """Parse LLM output into structured reference information"""
+        try:
+            # Try to extract JSON from the output
+            start_idx = llm_output.find('[')
+            end_idx = llm_output.rfind(']') + 1
+            
+            if start_idx >= 0 and end_idx > start_idx:
+                json_str = llm_output[start_idx:end_idx]
+                references = json.loads(json_str)
+                
+                # Validate and clean references
+                cleaned_refs = []
+                for ref in references:
+                    if isinstance(ref, dict) and ref.get("name"):
+                        cleaned_refs.append({
+                            "name": ref.get("name", "Unknown"),
+                            "email": ref.get("email", "Not provided"),
+                            "company": ref.get("company", "Unknown"),
+                            "relationship": ref.get("relationship", "Professional contact"),
+                            "years_worked": ref.get("years_worked", "Unknown"),
+                            "context": ref.get("context", "")
+                        })
+                
+                return cleaned_refs
+            else:
+                return []
+        except json.JSONDecodeError:
+            return []
+
+    async def run_workflow(self, resume_url: str, role: str, organization: str) -> Dict[str, Any]:
+        """
+        Run the complete multi-agent workflow
+        """
+        initial_state = WorkflowState(
+            resume_url=resume_url,
+            role=role,
+            organization=organization,
+            resume_text="",
+            applicant_info={},
+            references=[],
+            questions=[],
+            vectorstore_path="",
+            error_message="",
+            status="initialized"
+        )
+        
+        # Execute the workflow
+        final_state = await self.workflow.ainvoke(initial_state)
+        
+        # Return the results
+        return {
+            "applicant_info": final_state.get("applicant_info", {}),
+            "references": final_state.get("references", []),
+            "questions": final_state.get("questions", []),
+            "vectorstore_path": final_state.get("vectorstore_path", ""),
+            "status": final_state.get("status", "unknown"),
+            "error_message": final_state.get("error_message", "")
+        }
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517

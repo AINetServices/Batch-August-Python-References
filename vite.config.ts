@@ -7,6 +7,7 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+<<<<<<< HEAD
   server: {
     proxy: {
       '/api': {
@@ -16,4 +17,6 @@ export default defineConfig({
       },
     },
   },
+=======
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
 });

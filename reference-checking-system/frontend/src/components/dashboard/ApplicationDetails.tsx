@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { CheckCircle, X, Edit, Send, Users, Mail, Building, Clock, FileText } from 'lucide-react'
 
+<<<<<<< HEAD
 
 interface Application {
   id: string
@@ -21,6 +22,16 @@ interface Application {
 interface ApplicationDetailsProps {
   application: Application  // This should match your Dashboard's Application interface
   onUpdate: () => void
+=======
+interface Application {
+  id: string
+  role: string
+  organization: string
+  status: string
+  created_at: string
+  resume_url: string
+  extracted_data: any
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
 }
 
 interface ApplicationDetailsProps {
@@ -45,8 +56,13 @@ export function ApplicationDetails({ application, onUpdate }: ApplicationDetails
       const { data, error } = await supabase
         .from('questions')
         .select('questions')
+<<<<<<< HEAD
         .eq('role', application.roles?.name || '')  // Use role name from joined table
         .eq('organization', application.organizations?.name || '')  // Use org name from joined table
+=======
+        .eq('role', application.role)
+        .eq('organization', application.organization)
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
         .single()
 
       if (data) {
@@ -136,12 +152,17 @@ export function ApplicationDetails({ application, onUpdate }: ApplicationDetails
         <div className="flex items-center mb-4">
           {getStatusIcon(application.status)}
           <div className="ml-3">
+<<<<<<< HEAD
             <h2 className="text-lg font-bold text-gray-900">
               {application.roles?.name || 'Unknown Role'}
             </h2>
             <p className="text-gray-600">
               {application.organizations?.name || 'Unknown Organization'}
             </p>
+=======
+            <h2 className="text-lg font-bold text-gray-900">{application.role}</h2>
+            <p className="text-gray-600">{application.organization}</p>
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
           </div>
         </div>
         
@@ -178,6 +199,7 @@ export function ApplicationDetails({ application, onUpdate }: ApplicationDetails
                           <Mail className="h-3 w-3 mr-2" />
                           {ref.email}
                         </div>
+<<<<<<< HEAD
                         {ref.company && (
                           <div className="flex items-center">
                             <Building className="h-3 w-3 mr-2" />
@@ -193,6 +215,13 @@ export function ApplicationDetails({ application, onUpdate }: ApplicationDetails
                         {ref.years_worked && (
                           <div>Years worked together: {ref.years_worked}</div>
                         )}
+=======
+                        <div className="flex items-center">
+                          <Building className="h-3 w-3 mr-2" />
+                          {ref.company} • {ref.relationship}
+                        </div>
+                        <div>Years worked together: {ref.years_worked}</div>
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
                       </div>
                     </div>
                   ))}

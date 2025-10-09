@@ -3,6 +3,7 @@ import { FileText, Clock, CheckCircle, Send, Users, Calendar } from 'lucide-reac
 
 interface Application {
   id: string
+<<<<<<< HEAD
   user_id: string
   resume_url: string
   role_id: string
@@ -19,6 +20,14 @@ interface ApplicationsListProps {
   applications: Application[]  // This should match your Dashboard's Application interface
   onSelectApplication: (app: Application) => void
   selectedApplication: Application | null
+=======
+  role: string
+  organization: string
+  status: string
+  created_at: string
+  resume_url: string
+  extracted_data: any
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
 }
 
 interface ApplicationsListProps {
@@ -109,10 +118,17 @@ export function ApplicationsList({ applications, onSelectApplication, selectedAp
                 <div className="flex items-center mb-2">
                   {getStatusIcon(app.status)}
                   <h3 className="text-lg font-semibold text-gray-900 ml-3">
+<<<<<<< HEAD
                     {app.roles?.name || 'Unknown Role'}
                   </h3>
                 </div>
                 <p className="text-gray-600 mb-3">{app.organizations?.name || 'Unknown Organization'}</p>
+=======
+                    {app.role}
+                  </h3>
+                </div>
+                <p className="text-gray-600 mb-3">{app.organization}</p>
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
                 
                 <div className="flex items-center space-x-4">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(app.status)}`}>

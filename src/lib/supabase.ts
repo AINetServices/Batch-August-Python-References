@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 
+<<<<<<< HEAD
 // Get environment variables with proper validation
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -31,6 +32,13 @@ if (!supabaseUrl.startsWith('https://')) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // ... rest of your types
+=======
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
 export type Json =
   | string
   | number

@@ -4,18 +4,24 @@ Handles resume processing, reference extraction, and question management.
 """
 
 import os
+<<<<<<< HEAD
 import re
+=======
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import asyncio
 from dotenv import load_dotenv
+<<<<<<< HEAD
 from io import BytesIO
 import pdfplumber
 import requests
 import re
 
+=======
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
 
 from agents.reference_checking_workflow import ReferenceCheckingWorkflow
 from services.supabase_service import SupabaseService
@@ -33,12 +39,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+<<<<<<< HEAD
 # Add this at the top of your main.py after imports
 print("🔍 Environment Variables Check:")
 print(f"   SUPABASE_URL: {'✅ Set' if os.getenv('SUPABASE_URL') else '❌ Not set'}")
 print(f"   SUPABASE_SERVICE_KEY: {'✅ Set' if os.getenv('SUPABASE_SERVICE_KEY') else '❌ Not set'}")
 print(f"   GROQ_API_KEY: {'✅ Set' if os.getenv('GROQ_API_KEY') else '❌ Not set'}")
 
+=======
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
 # Initialize services
 workflow = ReferenceCheckingWorkflow()
 db_service = SupabaseService()
@@ -48,13 +57,17 @@ class ProcessResumeRequest(BaseModel):
     role: str
     organization: str
     user_id: str
+<<<<<<< HEAD
     application_id: str
+=======
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
 
 class SendQuestionsRequest(BaseModel):
     application_id: str
     questions: List[str]
     references: List[Dict[str, Any]]
 
+<<<<<<< HEAD
 def parse_reference_data(reference_text):
     """Parse the reference text into structured data for the database"""
     print(f"🔍 Parsing reference text: {reference_text}")
@@ -212,12 +225,15 @@ def validate_extracted_data(result: Dict[str, Any]) -> Dict[str, Any]:
     
     return result
 
+=======
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
 @app.get("/")
 async def root():
     return {"message": "Reference Checking System API", "version": "1.0.0"}
 
 @app.post("/api/process-resume")
 async def process_resume(request: ProcessResumeRequest):
+<<<<<<< HEAD
     try:
         print(f"🚀 Starting AI-powered resume processing for application {request.application_id}")
         print(f"📄 Resume URL: {request.resume_url}")
@@ -438,6 +454,60 @@ async def debug_workflow_test(resume_url: str, role: str, organization: str):
         }
     except Exception as e:
         return {"error": str(e)}
+=======
+    """
+    Process uploaded resume using the multi-agent workflow.
+    Extracts applicant details and references, then updates the database.
+    """
+    try:
+        # Run the multi-agent workflow
+        result = await workflow.run_workflow(
+            resume_url=request.resume_url,
+            role=request.role,
+            organization=request.organization
+        )
+        
+        # Update application in database
+        await db_service.update_application(
+            user_id=request.user_id,
+            role=request.role,
+            organization=request.organization,
+            extracted_data=result,
+            status="extracted"
+        )
+        
+        return {"success": True, "data": result}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing resume: {str(e)}")
+
+@app.post("/api/send-questions")
+async def send_questions(request: SendQuestionsRequest):
+    """
+    Send approved questions to references via email.
+    Creates reference records in the database.
+    """
+    try:
+        # Create reference records
+        for ref in request.references:
+            await db_service.create_reference(
+                application_id=request.application_id,
+                reference_data=ref,
+                questions=request.questions
+            )
+        
+        # Here you would integrate with an email service
+        # For now, we'll just update the application status
+        await db_service.update_application_status(
+            application_id=request.application_id,
+            status="sent"
+        )
+        
+        return {"success": True, "message": "Questions sent to references"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error sending questions: {str(e)}")
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
 
 @app.get("/health")
 async def health_check():

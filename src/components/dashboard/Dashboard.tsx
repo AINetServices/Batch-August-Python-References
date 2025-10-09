@@ -37,14 +37,18 @@ export function Dashboard() {
 
   const fetchApplications = async () => {
     try {
+<<<<<<< HEAD
       console.log("🔄 Fetching applications from Supabase...")
       
       // FIX: Use simpler query without joins that might be causing issues
+=======
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
       const { data, error } = await supabase
         .from('applications')
         .select('*')
         .order('created_at', { ascending: false })
 
+<<<<<<< HEAD
       if (error) {
         console.error('❌ Supabase error:', error)
         throw error
@@ -96,6 +100,22 @@ export function Dashboard() {
       
     } catch (error) {
       console.error('❌ Error fetching applications:', error)
+=======
+      if (error) throw error
+
+      setApplications(data || [])
+      
+      // Calculate stats
+      const stats = (data || []).reduce((acc, app) => {
+        acc.total++
+        acc[app.status as keyof typeof acc] = (acc[app.status as keyof typeof acc] || 0) + 1
+        return acc
+      }, { total: 0, processing: 0, approved: 0, completed: 0 })
+      
+      setStats(stats)
+    } catch (error) {
+      console.error('Error fetching applications:', error)
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
     } finally {
       setLoading(false)
     }
@@ -112,10 +132,14 @@ export function Dashboard() {
 
   const handleUploadComplete = () => {
     setShowUpload(false)
+<<<<<<< HEAD
     // Add a small delay to ensure backend processing completes
     setTimeout(() => {
       fetchApplications()
     }, 1000)
+=======
+    fetchApplications()
+>>>>>>> 5ef3108f3d16761ce7924e7b6ff831895e47f517
   }
 
   if (loading) {
