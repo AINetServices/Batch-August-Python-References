@@ -16,15 +16,14 @@ class VectorStoreTool(BaseTool):
     
     name: str = "vector_store"
     description: str = "Create and query vector stores for semantic document search"
-    
+    embeddings: HuggingFaceEmbeddings
     def __init__(self, embeddings: HuggingFaceEmbeddings):
-        super().__init__()
-        self.embeddings = embeddings
-        self.text_splitter = RecursiveCharacterTextSplitter(
+        text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000,
             chunk_overlap=200,
             separators=["\n\n", "\n", ". ", " "]
         )
+        super().__init__(embeddings=embeddings, text_splitter=text_splitter)
 
     def _run(self, action: str, **kwargs) -> Dict[str, Any]:
         """Perform vector store operations based on action type"""

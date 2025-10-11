@@ -14,13 +14,20 @@ class QuestionFetcherTool(BaseTool):
     
     name: str = "question_fetcher"
     description: str = "Fetch predefined reference questions based on role and organization"
-    
+    supabase: Client
+    # def __init__(self):
+    #     super().__init__()
+    #     self.supabase: Client = create_client(
+    #         os.getenv("VITE_SUPABASE_URL"),
+    #         os.getenv("VITE_SUPABASE_ANON_KEY")
+    #     )
     def __init__(self):
-        super().__init__()
-        self.supabase: Client = create_client(
-            os.getenv("VITE_SUPABASE_URL"),
-            os.getenv("VITE_SUPABASE_ANON_KEY")
-        )
+            # Simple and clear - create client, pass to parent
+            supabase_client = create_client(
+                os.getenv("VITE_SUPABASE_URL"),
+                os.getenv("VITE_SUPABASE_ANON_KEY")
+            )
+            super().__init__(supabase=supabase_client)
 
     def _run(self, role: str, organization: str) -> List[str]:
         """Fetch questions for a specific role and organization"""
