@@ -100,16 +100,24 @@ export function ApplicationUpload({ onComplete }: ApplicationUploadProps) {
       console.log('File uploaded successfully:', urlData.publicUrl);
 
       // Use a database function to handle the complex insert
-      const { data, error: dbError } = await supabase.rpc('create_application_with_org', {
-        p_user_id: user.id,
-        p_resume_url: urlData.publicUrl,
-        p_role_name: roleName.trim(),
-        p_org_name: orgName.trim(),
-        p_status: 'processing'
-      })
+      const { data, error: dbError } = await supabase
+        .from('applications')
+        .insert({
+          user_id: user.id,
+          resume_url: urlData.publicUrl,
+          role: roleName.trim(),
+          organization: orgName.trim(),
+          status: 'processing'
+        })
+        .select()
+        .single()
+
+      
 
       // Debug log
       console.log('Database function response:', { data, error: dbError });
+
+      
 
       if (dbError) throw dbError
 
@@ -122,10 +130,10 @@ export function ApplicationUpload({ onComplete }: ApplicationUploadProps) {
           },
           body: JSON.stringify({
             resume_url: urlData.publicUrl,
-            role_name: roleName.trim(),
-            organization_name: orgName.trim(),
+            role: roleName.trim(),
+            organization: orgName.trim(),
             user_id: user.id,
-            application_id: data.application_id
+            application_id: data.id
           })
         })
 
