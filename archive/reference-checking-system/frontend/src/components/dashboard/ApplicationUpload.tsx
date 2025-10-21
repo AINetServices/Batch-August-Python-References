@@ -61,7 +61,7 @@ export function ApplicationUpload({ onComplete }: ApplicationUploadProps) {
       const fileName = `${user.id}/${Date.now()}.${fileExt}`
       
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('resumes')
+        .from('resumes2')
         .upload(fileName, file)
 
       if (uploadError) throw uploadError

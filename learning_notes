@@ -5,3 +5,6 @@ multimodal (input video images, tables) done using multimodal convert image, vid
 autogen is a hobby thing (you can write a couple of lines, it is like the nodes in a round table (the nodes being AI agents))
 
 Lanchain (more professional than autogen, connects the nodes (ai agents) 1-2-3-4 but like if at step 3 wrong then go back to 1)
+
+
+its under the references-checking-system\frontend folder, im not sure what the other one? 
