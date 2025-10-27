@@ -125,10 +125,10 @@ export function ApplicationUpload({ onComplete }: ApplicationUploadProps) {
       console.log("Database function response:", { data, error: dbError });
 
       if (dbError) throw dbError;
-
+      const api_base_url = "http://localhost:8000"
       // OPTIONAL: Try to call Python backend, but don't fail if it's not set up
       try {
-        const processResponse = await fetch("/api/process-resume", {
+        const processResponse = await fetch(`${api_base_url}/api/process-resume`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
