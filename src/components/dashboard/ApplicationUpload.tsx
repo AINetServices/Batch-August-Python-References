@@ -120,7 +120,7 @@ export function ApplicationUpload({ onComplete }: ApplicationUploadProps) {
         })
         .select()
         .single();
-
+ 
       // Debug log
       console.log("Database function response:", { data, error: dbError });
 

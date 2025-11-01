@@ -10,11 +10,10 @@ from datetime import datetime
 
 class SupabaseService:
     """Service class for Supabase operations"""
-    
     def __init__(self):
         self.supabase: Client = create_client(
             os.getenv("VITE_SUPABASE_URL"),
-            os.getenv("VITE_SUPABASE_ANON_KEY")
+            os.getenv("VITE_SUPABASE_SERVICE_KEY")
         )
 
     async def update_application(self, user_id: str, role: str, organization: str, 

@@ -93,12 +93,12 @@ class ReferenceCheckingWorkflow:
         """Download and extract text from resume URL"""
         try:
             response = requests.get(state["resume_url"])
-            response.raise_for_status()
+            response.raise_for_status() 
             
             # Use resume parser to extract text
             resume_text = self.resume_parser.parse_file_content(
                 BytesIO(response.content), 
-                state["resume_url"]
+                state["resume_url"] 
             )
             
             state["resume_text"] = resume_text

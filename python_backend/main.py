@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 from agents.reference_checking_workflow import ReferenceCheckingWorkflow
 from services.supabase_service import SupabaseService
 
+
 load_dotenv()
 
 app = FastAPI(title="Reference Checking System", version="1.0.0")
@@ -60,7 +61,7 @@ async def process_resume(request: ProcessResumeRequest):
             organization=request.organization
         )
         
-        # Update application in database
+        # Update application in dzatabase
         await db_service.update_application(
             user_id=request.user_id,
             role=request.role,
