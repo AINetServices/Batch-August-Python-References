@@ -153,7 +153,7 @@ class ReferenceCheckingWorkflow:
 
             from langchain_core.messages import ToolMessage
             tool_content = next((msg.content for msg in result["messages"] if isinstance(msg, ToolMessage) and msg.name == "extract_applicant_info"), None)
-            applicant_info = self._parse_applicant_info(result["output"])
+            applicant_info = self._parse_applicant_info(tool_content)
             state["applicant_info"] = applicant_info
             state["status"] = "applicant_extracted"
             
