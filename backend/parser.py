@@ -16,7 +16,7 @@ class ResumeParser:
             raise ValueError("Missing GROQ_API_KEY in environment variables")
         
         self.groq_client = Groq(api_key=api_key)
-        self.model_name = "llama3-70b-8192"
+        self.model_name = "llama-3.1-8b-instant"
     
     def extract_text_from_pdf(self, file_content: bytes) -> str:
         """Extract text from PDF file content"""

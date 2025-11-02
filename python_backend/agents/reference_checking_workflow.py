@@ -46,9 +46,10 @@ class ReferenceCheckingWorkflow:
     
     def __init__(self):
         self.llm = ChatGroq(
-            model="llama3-70b-8192",
+            model="llama-3.1-8b-instant",
             api_key=os.getenv("GROQ_API_KEY")
         )
+        print(os.getenv("GROQ_API_KEY"))
         self.embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en")
         
         # Initialize tools
@@ -143,10 +144,10 @@ class ReferenceCheckingWorkflow:
             applicant_agent = self._create_applicant_agent()
             
             # Extract applicant information
-            result = applicant_agent.invoke({
-                "input": f"Extract applicant information from this resume: {state['resume_text'][:2000]}...",
-                "resume_text": state["resume_text"]
-            })
+            result = applicant_agent.invoke(
+                {"messages": [{"role": "user", "content": "Extract applicant information from the provided resume."}]},
+                context={"user_role": "expert"}
+            )
             
             # Parse the result
             applicant_info = self._parse_applicant_info(result["output"])
