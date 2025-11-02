@@ -150,6 +150,9 @@ class ReferenceCheckingWorkflow:
             )
             
             # Parse the result
+
+            from langchain_core.messages import ToolMessage
+            tool_content = next((msg.content for msg in result["messages"] if isinstance(msg, ToolMessage) and msg.name == "extract_applicant_info"), None)
             applicant_info = self._parse_applicant_info(result["output"])
             state["applicant_info"] = applicant_info
             state["status"] = "applicant_extracted"
@@ -263,7 +266,7 @@ class ReferenceCheckingWorkflow:
             Resume Text:
             {resume_text}
             
-            Extract and return as JSON:
+            Extract and return as JSON in the following format:
             - full_name: The applicant's full name
             - email: Email address
             - phone: Phone number
@@ -271,7 +274,7 @@ class ReferenceCheckingWorkflow:
             - experience_years: Estimated years of experience
             - key_skills: List of main skills/competencies
             
-            Return only the JSON object:
+            Return only the JSON object and nothing else, no code no other information, only pure JSON:
             """)
             
             result = self.llm.invoke(prompt.format(resume_text=resume_text))
