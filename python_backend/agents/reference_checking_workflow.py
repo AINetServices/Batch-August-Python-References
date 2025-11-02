@@ -172,7 +172,7 @@ class ReferenceCheckingWorkflow:
             # Create specialized agent for reference extraction
             reference_agent = self._create_reference_agent()
             
-            # Extract references
+            # Extract references # you need to fix everywhere where it invokes like this with input, resume text to the applicant node one
             result = reference_agent.invoke({
                 "input": f"Extract reference contacts from this resume for {state['role']} position",
                 "resume_text": state["resume_text"],
