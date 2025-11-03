@@ -177,8 +177,10 @@ class ReferenceCheckingWorkflow:
                     {"role": "user", "content": f"Extract reference contacts from this resume {state['resume_text']}"}
                 ]
             })
+            from langchain_core.messages import ToolMessage
+            tool_content = next((msg.content for msg in result["messages"] if isinstance(msg, ToolMessage) and msg.name == "extract_references"), None)
             # Parse references
-            references = self._parse_references(result["output"])
+            references = self._parse_references(tool_content)
             state["references"] = references
             state["status"] = "references_extracted"
             
