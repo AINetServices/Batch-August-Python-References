@@ -1,0 +1,91 @@
+[
+  {
+    "type": "HumanMessage",
+    "id": "9fc6dc19-500e-4457-acef-bfe33adcb96a",
+    "content": "Extract applicant information from the provided resume.",
+    "additional_kwargs": {},
+    "response_metadata": {}
+  },
+  {
+    "type": "AIMessage",
+    "id": "run--cc561873-8158-4951-b8fc-c2a322e775f1-0",
+    "content": "",
+    "additional_kwargs": {
+      "tool_calls": [
+        {
+          "id": "5yxqqja3z",
+          "function": {
+            "arguments": "{\"resume_text\":\"John Doe's resume text here with contact info and basic details\"}",
+            "name": "extract_applicant_info"
+          },
+          "type": "function"
+        }
+      ]
+    },
+    "response_metadata": {
+      "token_usage": {
+        "completion_tokens": 29,
+        "prompt_tokens": 238,
+        "total_tokens": 267,
+        "completion_time": 0.044569924,
+        "prompt_time": 0.013060491,
+        "queue_time": 0.168760919,
+        "total_time": 0.057630415
+      },
+      "model_name": "llama-3.1-8b-instant",
+      "system_fingerprint": "fp_6b5c123dd9",
+      "service_tier": "on_demand",
+      "finish_reason": "tool_calls",
+      "logprobs": null
+    },
+    "tool_calls": [
+      {
+        "name": "extract_applicant_info",
+        "args": {
+          "resume_text": "John Doe's resume text here with contact info and basic details"
+        },
+        "id": "5yxqqja3z",
+        "type": "tool_call"
+      }
+    ],
+    "usage_metadata": {
+      "input_tokens": 238,
+      "output_tokens": 29,
+      "total_tokens": 267
+    }
+  },
+  {
+    "type": "ToolMessage",
+    "id": "2a19e073-20f1-4ac9-9c3b-5052760c9c86",
+    "content": "```python\nimport json\nimport re\n\ndef extract_applicant_info(resume_text):\n    # Extract full name\n    match = re.search(r\"([A-Za-z]+ [A-Za-z]+)\", resume_text)\n    full_name = match.group(0) if match else \"Unknown\"\n\n    # Extract email\n    match = re.search(r\"\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b\", resume_text)\n    email = match.group(0) if match else \"Unknown\"\n\n    # Extract phone number\n    match = re.search(r\"\\b\\d{3}[-\\.\\s]??\\d{3}[-\\.\\s]??\\d{4}\\b\", resume_text)\n    phone = match.group(0) if match else \"Unknown\"\n\n    # Extract current position\n    match = re.search(r\"([A-Za-z]+ [A-Za-z]+)\", resume_text)\n    current_position = match.group(0) if match else \"Unknown\"\n\n    # Extract experience years\n    experience_years = re.search(r\"(\\d+) years\", resume_text)\n    experience_years = int(experience_years.group(1)) if experience_years else 0\n\n    # Extract key skills\n    match = re.search(r\"Key Skills:\\s*(.*)\", resume_text, re.IGNORECASE)\n    key_skills = match.group(1).split(\", \") if match else []\n\n    applicant_info = {\n        \"full_name\": full_name,\n        \"email\": email,\n        \"phone\": phone,\n        \"current_position\": current_position,\n        \"experience_years\": experience_years,\n        \"key_skills\": key_skills\n    }\n\n    return json.dumps(applicant_info)\n\n# Example usage\nresume_text = \"\"\"\nJohn Doe\n123 Main St, Anytown, USA 12345\n(123) 456-7890\njohndoe@email.com\n\nObjective: To obtain a challenging position that utilizes my skills and experience.\n\nWork Experience:\n- Current Position: Software Engineer, ABC Company (2018 - Present)\n  - Designed and implemented multiple software applications using Java and C++.\n\nKey Skills:\n  - Java\n  - C++\n  - Python\n  - Data Structures\n  - Algorithms\n\"\"\"\n\nprint(extract_applicant_info(resume_text))\n```\n\nThis script uses regular expressions to extract the required applicant information from the resume text. The `extract_applicant_info` function takes the resume text as input, extracts the required information, and returns it as a JSON object. The example usage demonstrates how to use this function with a sample resume text.",
+    "name": "extract_applicant_info",
+    "tool_call_id": "5yxqqja3z"
+  },
+  {
+    "type": "AIMessage",
+    "id": "run--cd424ca5-cd0a-4554-a464-da7d4cb22e99-0",
+    "content": "This script should work for most cases, but it may not work perfectly for all resumes. The regular expressions used to extract the information may not match all possible formats, and the script assumes that the resume text is in a specific format. Additionally, the script does not handle cases where the required information is not present in the resume text.",
+    "additional_kwargs": {},
+    "response_metadata": {
+      "token_usage": {
+        "completion_tokens": 68,
+        "prompt_tokens": 823,
+        "total_tokens": 891,
+        "completion_time": 0.089763077,
+        "prompt_time": 0.045928928,
+        "queue_time": 0.168264113,
+        "total_time": 0.135692005
+      },
+      "model_name": "llama-3.1-8b-instant",
+      "system_fingerprint": "fp_6b5c123dd9",
+      "service_tier": "on_demand",
+      "finish_reason": "stop",
+      "logprobs": null
+    },
+    "usage_metadata": {
+      "input_tokens": 823,
+      "output_tokens": 68,
+      "total_tokens": 891
+    }
+  }
+]

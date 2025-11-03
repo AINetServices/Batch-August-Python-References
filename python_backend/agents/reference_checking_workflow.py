@@ -143,14 +143,14 @@ class ReferenceCheckingWorkflow:
             # Create specialized agent for applicant extraction
             applicant_agent = self._create_applicant_agent()
             
-            # Extract applicant information
-            result = applicant_agent.invoke(
-                {"messages": [{"role": "user", "content": "Extract applicant information from the provided resume."}]},
-                context={"user_role": "expert"}
-            )
+
+            result = applicant_agent.invoke({
+                "messages": [
+                    {"role": "user", "content": f"Extract applicant info from this resume: {state['resume_text']}"}
+                ]
+            })
             
             # Parse the result
-
             from langchain_core.messages import ToolMessage
             tool_content = next((msg.content for msg in result["messages"] if isinstance(msg, ToolMessage) and msg.name == "extract_applicant_info"), None)
             applicant_info = self._parse_applicant_info(tool_content)
