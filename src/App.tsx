@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useAuth } from './hooks/useAuth'
 import { AuthForm } from './components/auth/AuthForm'
 import { Dashboard } from './components/dashboard/Dashboard'
+import { AnalyticsDashboard } from './components/dashboard/Analytics';
 
 type AuthMode = 'signin' | 'signup' | 'forgot'
 
