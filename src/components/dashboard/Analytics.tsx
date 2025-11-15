@@ -1,60 +1,151 @@
 import { useState, useEffect } from 'react';
-import { BarChart3, TrendingUp, Users, FileText, Activity, RefreshCw } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, FileText, Activity } from 'lucide-react';
+
+// Recharts Imports - Added BarChart, PieChart, Cell, AreaChart
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area
+} from 'recharts';
+
+// --- 1. NEW DATASETS FOR NEW CHARTS ---
+
+// Data for Horizontal Bar Chart (e.g., Processing Time by Department)
+const barChartData = [
+  { department: 'HR', time: 1.5 },
+  { department: 'Sales', time: 2.1 },
+  { department: 'Tech', time: 0.9 },
+  { department: 'Legal', time: 3.5 },
+  { department: 'Ops', time: 1.8 },
+];
+
+// Data for Pie Chart (e.g., Application Status Distribution)
+const pieChartData = [
+  { name: 'Completed', value: 450 },
+  { name: 'Pending', value: 300 },
+  { name: 'Rejected', value: 250 },
+];
+const PIE_COLORS = ['#3b82f6', '#10b981', '#f87171']; // blue, green, red
+
+// Data for Area Chart (e.g., Total System Activity)
+const areaChartData = [
+    { name: 'Wk 1', activity: 30 },
+    { name: 'Wk 2', activity: 45 },
+    { name: 'Wk 3', activity: 60 },
+    { name: 'Wk 4', activity: 75 },
+    { name: 'Wk 5', activity: 90 },
+];
+
+// Data for Line Chart (from previous version)
+const lineChartData = [
+    { name: 'Jan', applications: 400, references: 240 },
+    { name: 'Feb', applications: 300, references: 139 },
+    { name: 'Mar', applications: 600, references: 980 },
+    { name: 'Apr', applications: 500, references: 390 },
+    { name: 'May', applications: 780, references: 480 },
+    { name: 'Jun', applications: 800, references: 380 },
+    { name: 'Jul', applications: 900, references: 430 },
+];
+
+// --- 2. NEW CHART COMPONENTS FOR SIMPLICITY ---
+
+// Horizontal Bar Chart (Sideway Columns)
+const HorizontalBarChart = () => (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full">
+        <h2 className="text-lg font-bold text-gray-900 mb-4">Avg. Time by Department (Days)</h2>
+        <ResponsiveContainer width="100%" height={250}>
+            {/* Note: layout="vertical" makes it a sideways column chart */}
+            <BarChart data={barChartData} layout="vertical" margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" stroke="#6b7280" />
+                <YAxis dataKey="department" type="category" stroke="#6b7280" width={80} />
+                <Tooltip />
+                <Bar dataKey="time" fill="#10b981" name="Avg. Time (Days)" />
+            </BarChart>
+        </ResponsiveContainer>
+    </div>
+);
+
+// Pie Chart (Simple Distribution)
+const StatusPieChart = () => (
+
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full">
+        <h2 className="text-lg font-bold text-gray-900 mb-4">Application Status Distribution</h2>
+        <ResponsiveContainer width="100%" height={250}>
+            <PieChart>
+                <Pie
+                    data={pieChartData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    labelLine={false}
+                    label={({ name, percent }) => `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`}
+                >
+                    {pieChartData.map((_entry, index) => (
+                        <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                    ))}
+                </Pie>
+                <Tooltip />
+            </PieChart>
+        </ResponsiveContainer>
+    </div>
+);
+
+// Area Chart (System Activity)
+const SystemActivityAreaChart = () => (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full">
+        <h2 className="text-lg font-bold text-gray-900 mb-4">Weekly System Activity (Count)</h2>
+        <ResponsiveContainer width="100%" height={250}>
+            <AreaChart data={areaChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" stroke="#6b7280" />
+                <YAxis stroke="#6b7280" />
+                <Tooltip />
+                <Area type="monotone" dataKey="activity" stroke="#f97316" fill="#fed7aa" name="Total Activity" />
+            </AreaChart>
+        </ResponsiveContainer>
+    </div>
+);
+
+// Line Chart (from previous version)
+const TrendLineChart = () => (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full">
+        <h2 className="text-lg font-bold text-gray-900 mb-4">Applications & References Trend</h2>
+        <ResponsiveContainer width="100%" height={250}>
+            <LineChart
+                data={lineChartData}
+                margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+            >
+                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                <XAxis dataKey="name" stroke="#6b7280" />
+                <YAxis stroke="#6b7280" />
+                <Tooltip />
+                <Line type="monotone" dataKey="applications" stroke="#3b82f6" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 8 }} name="Total Applications" />
+                <Line type="monotone" dataKey="references" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 8 }} name="Active References" />
+            </LineChart>
+        </ResponsiveContainer>
+    </div>
+);
+
+
+// --- 3. MAIN COMPONENT (LAYOUT) ---
 
 export function AnalyticsDashboard() {
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-
+  
   // Simulate loading for demo
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1500);
     return () => clearTimeout(timer);
   }, []);
 
-  const handleRefresh = () => {
-    setRefreshing(true);
-    // Reload the Tableau viz
-    const iframe = document.getElementById('tableau-viz') as HTMLIFrameElement;
-    if (iframe) {
-      iframe.src = iframe.src;
-    }
-    setTimeout(() => setRefreshing(false), 1000);
-  };
-
-  // Sample metrics - you would replace these with real data from your API
+  // Sample metrics - kept the original metrics data
   const metrics = [
-    {
-      title: 'Total Applications',
-      value: '1,234',
-      change: '+12.5%',
-      trend: 'up',
-      icon: FileText,
-      color: 'blue'
-    },
-    {
-      title: 'Active References',
-      value: '3,421',
-      change: '+8.2%',
-      trend: 'up',
-      icon: Users,
-      color: 'green'
-    },
-    {
-      title: 'Response Rate',
-      value: '87.3%',
-      change: '+3.1%',
-      trend: 'up',
-      icon: TrendingUp,
-      color: 'purple'
-    },
-    {
-      title: 'Avg. Processing Time',
-      value: '2.4 days',
-      change: '-15%',
-      trend: 'down',
-      icon: Activity,
-      color: 'indigo'
-    }
+    { title: 'Total Applications', value: '1,234', change: '+12.5%', trend: 'up', icon: FileText, color: 'blue' },
+    { title: 'Active References', value: '3,421', change: '+8.2%', trend: 'up', icon: Users, color: 'green' },
+    { title: 'Response Rate', value: '87.3%', change: '+3.1%', trend: 'up', icon: TrendingUp, color: 'purple' },
+    { title: 'Avg. Processing Time', value: '2.4 days', change: '-15%', trend: 'down', icon: Activity, color: 'indigo' }
   ];
 
   const getColorClasses = (color: string) => {
@@ -80,33 +171,10 @@ export function AnalyticsDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center">
-              <div className="h-10 w-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
-                <BarChart3 className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">Analytics Dashboard</h1>
-                <p className="text-sm text-gray-600">Reference Checking System Overview</p>
-              </div>
-            </div>
-            <button
-              onClick={handleRefresh}
-              disabled={refreshing}
-              className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 disabled:opacity-50"
-            >
-              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-              <span>Refresh</span>
-            </button>
-          </div>
-        </div>
-      </header> */}
+      
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Key Metrics */}
+        {/* Key Metrics - Unchanged */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {metrics.map((metric, index) => {
             const Icon = metric.icon;
@@ -127,59 +195,20 @@ export function AnalyticsDashboard() {
           })}
         </div>
 
-        {/* Tableau Embedded Dashboard */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-bold text-gray-900 mb-1">Detailed Analytics</h2>
-                <p className="text-sm text-gray-600">Interactive visualization powered by Tableau</p>
-              </div>
-              <div className="flex items-center space-x-2 text-sm text-gray-500">
-                <Activity className="h-4 w-4" />
-                <span>Live Data</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Tableau iFrame Container */}
-          <div className="relative" style={{ paddingBottom: '56.25%', height: 0 }}>
-            <iframe
-              id="tableau-viz"
-              src="https://public.tableau.com/views/YourDashboardName/Dashboard1?:embed=y&:display_count=yes&:showVizHome=no"
-              className="absolute top-0 left-0 w-full h-full"
-              style={{ border: 0 }}
-              allowFullScreen
-              title="Tableau Analytics Dashboard"
-            />
-          </div>
-
-          {/* Instructions for setting up Tableau */}
-          <div className="p-6 bg-blue-50 border-t border-blue-100">
-            <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0">
-                <div className="h-8 w-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="h-5 w-5 text-blue-600" />
-                </div>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-sm font-semibold text-blue-900 mb-2">Setup Instructions</h3>
-                <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
-                  <li>Publish your dashboard to Tableau Public or Tableau Server</li>
-                  <li>Get the embed URL (Share → Embed Code)</li>
-                  <li>Replace the iframe src URL above with your dashboard URL</li>
-                  <li>Ensure the URL includes parameters: <code className="bg-blue-100 px-1 rounded">?:embed=y&:display_count=yes&:showVizHome=no</code></li>
-                </ol>
-                <p className="text-sm text-blue-700 mt-3">
-                  <strong>Note:</strong> For Tableau Server, you may need to configure CORS settings to allow embedding.
-                </p>
-              </div>
-            </div>
-          </div>
+        {/* 4. NEW 2x2 CHART GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <TrendLineChart />
+            <HorizontalBarChart />
+            <StatusPieChart />
+            <SystemActivityAreaChart />
         </div>
 
-        {/* Additional Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        {/* The Quick Actions and Recent Activity cards have been removed for a cleaner, chart-focused dashboard, 
+            but you can re-introduce them if you need more layout variety: */}
+        
+             {/* Additional Info Cards (Unchanged) */}
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+          {/* ... Quick Actions and Recent Activity cards remain here ... */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
             <div className="space-y-3">
@@ -231,6 +260,8 @@ export function AnalyticsDashboard() {
             </div>
           </div>
         </div>
+       
+
       </div>
     </div>
   );
