@@ -4,7 +4,6 @@ python_backend/__pycache__/
 python_backend/**/__pycache__/
 python_backend/**/**/__pycache__/
 
-test.py 
 # Environment variables
 .env
 .env.local
@@ -55,3 +54,7 @@ vectorstore/
 # Temporary files
 tmp/
 temp/
+
+# Other
+AI_INSTRUCTIONS.md
+test.py 
