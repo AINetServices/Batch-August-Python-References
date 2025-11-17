@@ -1,151 +1,314 @@
 import { useState, useEffect } from 'react';
 import { BarChart3, TrendingUp, Users, FileText, Activity } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 
-// Recharts Imports - Added BarChart, PieChart, Cell, AreaChart
+// Recharts Imports
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area
 } from 'recharts';
 
-// --- 1. NEW DATASETS FOR NEW CHARTS ---
+const PIE_COLORS = ['#3b82f6', '#10b981', '#f87171', '#f59e0b', '#8b5cf6']; // blue, green, red, orange, purple
 
-// Data for Horizontal Bar Chart (e.g., Processing Time by Department)
-const barChartData = [
-  { department: 'HR', time: 1.5 },
-  { department: 'Sales', time: 2.1 },
-  { department: 'Tech', time: 0.9 },
-  { department: 'Legal', time: 3.5 },
-  { department: 'Ops', time: 1.8 },
-];
+// --- CHART COMPONENTS ---
 
-// Data for Pie Chart (e.g., Application Status Distribution)
-const pieChartData = [
-  { name: 'Completed', value: 450 },
-  { name: 'Pending', value: 300 },
-  { name: 'Rejected', value: 250 },
-];
-const PIE_COLORS = ['#3b82f6', '#10b981', '#f87171']; // blue, green, red
-
-// Data for Area Chart (e.g., Total System Activity)
-const areaChartData = [
-    { name: 'Wk 1', activity: 30 },
-    { name: 'Wk 2', activity: 45 },
-    { name: 'Wk 3', activity: 60 },
-    { name: 'Wk 4', activity: 75 },
-    { name: 'Wk 5', activity: 90 },
-];
-
-// Data for Line Chart (from previous version)
-const lineChartData = [
-    { name: 'Jan', applications: 400, references: 240 },
-    { name: 'Feb', applications: 300, references: 139 },
-    { name: 'Mar', applications: 600, references: 980 },
-    { name: 'Apr', applications: 500, references: 390 },
-    { name: 'May', applications: 780, references: 480 },
-    { name: 'Jun', applications: 800, references: 380 },
-    { name: 'Jul', applications: 900, references: 430 },
-];
-
-// --- 2. NEW CHART COMPONENTS FOR SIMPLICITY ---
-
-// Horizontal Bar Chart (Sideway Columns)
-const HorizontalBarChart = () => (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Avg. Time by Department (Days)</h2>
-        <ResponsiveContainer width="100%" height={250}>
-            {/* Note: layout="vertical" makes it a sideways column chart */}
-            <BarChart data={barChartData} layout="vertical" margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" stroke="#6b7280" />
-                <YAxis dataKey="department" type="category" stroke="#6b7280" width={80} />
-                <Tooltip />
-                <Bar dataKey="time" fill="#10b981" name="Avg. Time (Days)" />
-            </BarChart>
-        </ResponsiveContainer>
-    </div>
+const HorizontalBarChart = ({ data }: { data: any[] }) => (
+  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full">
+    <h2 className="text-lg font-bold text-gray-900 mb-4">Applications by Role</h2>
+    <ResponsiveContainer width="100%" height={250}>
+      <BarChart data={data} layout="vertical" margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis type="number" stroke="#6b7280" />
+        <YAxis dataKey="role" type="category" stroke="#6b7280" width={120} />
+        <Tooltip />
+        <Bar dataKey="count" fill="#10b981" name="Applications" />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
 );
 
-// Pie Chart (Simple Distribution)
-const StatusPieChart = () => (
-
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Application Status Distribution</h2>
-        <ResponsiveContainer width="100%" height={250}>
-            <PieChart>
-                <Pie
-                    data={pieChartData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`}
-                >
-                    {pieChartData.map((_entry, index) => (
-                        <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                    ))}
-                </Pie>
-                <Tooltip />
-            </PieChart>
-        </ResponsiveContainer>
-    </div>
+const StatusPieChart = ({ data }: { data: any[] }) => (
+  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full">
+    <h2 className="text-lg font-bold text-gray-900 mb-4">Application Status Distribution</h2>
+    <ResponsiveContainer width="100%" height={250}>
+      <PieChart>
+        <Pie
+          data={data}
+          dataKey="value"
+          nameKey="name"
+          cx="50%"
+          cy="50%"
+          outerRadius={100}
+          labelLine={false}
+          label={({ name, percent }) => `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`}
+        >
+          {data.map((_entry, index) => (
+            <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+          ))}
+        </Pie>
+        <Tooltip />
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
 );
 
-// Area Chart (System Activity)
-const SystemActivityAreaChart = () => (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Weekly System Activity (Count)</h2>
-        <ResponsiveContainer width="100%" height={250}>
-            <AreaChart data={areaChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" stroke="#6b7280" />
-                <YAxis stroke="#6b7280" />
-                <Tooltip />
-                <Area type="monotone" dataKey="activity" stroke="#f97316" fill="#fed7aa" name="Total Activity" />
-            </AreaChart>
-        </ResponsiveContainer>
-    </div>
+const SystemActivityAreaChart = ({ data }: { data: any[] }) => (
+  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full">
+    <h2 className="text-lg font-bold text-gray-900 mb-4">Applications Over Time (Last 30 Days)</h2>
+    <ResponsiveContainer width="100%" height={250}>
+      <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="date" stroke="#6b7280" />
+        <YAxis stroke="#6b7280" />
+        <Tooltip />
+        <Area type="monotone" dataKey="count" stroke="#f97316" fill="#fed7aa" name="Applications" />
+      </AreaChart>
+    </ResponsiveContainer>
+  </div>
 );
 
-// Line Chart (from previous version)
-const TrendLineChart = () => (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Applications & References Trend</h2>
-        <ResponsiveContainer width="100%" height={250}>
-            <LineChart
-                data={lineChartData}
-                margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
-            >
-                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                <XAxis dataKey="name" stroke="#6b7280" />
-                <YAxis stroke="#6b7280" />
-                <Tooltip />
-                <Line type="monotone" dataKey="applications" stroke="#3b82f6" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 8 }} name="Total Applications" />
-                <Line type="monotone" dataKey="references" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 8 }} name="Active References" />
-            </LineChart>
-        </ResponsiveContainer>
-    </div>
+const TrendLineChart = ({ data }: { data: any[] }) => (
+  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full">
+    <h2 className="text-lg font-bold text-gray-900 mb-4">Applications & References Trend</h2>
+    <ResponsiveContainer width="100%" height={250}>
+      <LineChart data={data} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+        <XAxis dataKey="date" stroke="#6b7280" />
+        <YAxis stroke="#6b7280" />
+        <Tooltip />
+        <Line type="monotone" dataKey="applications" stroke="#3b82f6" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 8 }} name="Applications" />
+        <Line type="monotone" dataKey="references" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 8 }} name="References" />
+      </LineChart>
+    </ResponsiveContainer>
+  </div>
 );
 
-
-// --- 3. MAIN COMPONENT (LAYOUT) ---
+// --- MAIN COMPONENT ---
 
 export function AnalyticsDashboard() {
   const [loading, setLoading] = useState(true);
+  const [metrics, setMetrics] = useState({
+    totalApplications: 0,
+    activeReferences: 0,
+    responseRate: 0,
+    avgProcessingTime: 0,
+    prevTotalApplications: 0,
+    prevActiveReferences: 0,
+    prevResponseRate: 0,
+    prevAvgProcessingTime: 0
+  });
   
-  // Simulate loading for demo
+  const [statusData, setStatusData] = useState<any[]>([]);
+  const [roleData, setRoleData] = useState<any[]>([]);
+  const [timeSeriesData, setTimeSeriesData] = useState<any[]>([]);
+  const [trendData, setTrendData] = useState<any[]>([]);
+
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1500);
-    return () => clearTimeout(timer);
+    fetchAnalyticsData();
   }, []);
 
-  // Sample metrics - kept the original metrics data
-  const metrics = [
-    { title: 'Total Applications', value: '1,234', change: '+12.5%', trend: 'up', icon: FileText, color: 'blue' },
-    { title: 'Active References', value: '3,421', change: '+8.2%', trend: 'up', icon: Users, color: 'green' },
-    { title: 'Response Rate', value: '87.3%', change: '+3.1%', trend: 'up', icon: TrendingUp, color: 'purple' },
-    { title: 'Avg. Processing Time', value: '2.4 days', change: '-15%', trend: 'down', icon: Activity, color: 'indigo' }
+  const fetchAnalyticsData = async () => {
+    try {
+      setLoading(true);
+
+      // Fetch all applications
+      const { data: applications, error: appsError } = await supabase
+        .from('applications')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (appsError) throw appsError;
+
+      // Fetch all references
+      const { data: references, error: refsError } = await supabase
+        .from('references')
+        .select('*');
+
+      if (refsError) throw refsError;
+
+      // Calculate metrics
+      const now = new Date();
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+
+      // Current period (last 30 days)
+      const recentApps = applications?.filter(app => new Date(app.created_at) >= thirtyDaysAgo) || [];
+      const recentRefs = references?.filter(ref => new Date(ref.created_at) >= thirtyDaysAgo) || [];
+      
+      // Previous period (30-60 days ago)
+      const prevApps = applications?.filter(app => {
+        const date = new Date(app.created_at);
+        return date >= sixtyDaysAgo && date < thirtyDaysAgo;
+      }) || [];
+      const prevRefs = references?.filter(ref => {
+        const date = new Date(ref.created_at);
+        return date >= sixtyDaysAgo && date < thirtyDaysAgo;
+      }) || [];
+
+      // Response rate calculation
+      const respondedRefs = references?.filter(ref => ref.status === 'responded').length || 0;
+      const totalRefs = references?.length || 1;
+      const currentResponseRate = (respondedRefs / totalRefs) * 100;
+
+      const prevRespondedRefs = prevRefs.filter(ref => ref.status === 'responded').length || 0;
+      const prevTotalRefs = prevRefs.length || 1;
+      const prevResponseRate = (prevRespondedRefs / prevTotalRefs) * 100;
+
+      // Calculate average processing time
+      const completedApps = applications?.filter(app => app.status === 'completed') || [];
+      let totalProcessingTime = 0;
+      completedApps.forEach(app => {
+        const created = new Date(app.created_at).getTime();
+        const updated = new Date(app.updated_at).getTime();
+        const diffDays = (updated - created) / (1000 * 60 * 60 * 24);
+        totalProcessingTime += diffDays;
+      });
+      const avgProcessingTime = completedApps.length > 0 ? totalProcessingTime / completedApps.length : 0;
+
+      // Previous period processing time
+      const prevCompletedApps = prevApps.filter(app => app.status === 'completed');
+      let prevTotalProcessingTime = 0;
+      prevCompletedApps.forEach(app => {
+        const created = new Date(app.created_at).getTime();
+        const updated = new Date(app.updated_at).getTime();
+        const diffDays = (updated - created) / (1000 * 60 * 60 * 24);
+        prevTotalProcessingTime += diffDays;
+      });
+      const prevAvgProcessingTime = prevCompletedApps.length > 0 ? prevTotalProcessingTime / prevCompletedApps.length : avgProcessingTime;
+
+      setMetrics({
+        totalApplications: applications?.length || 0,
+        activeReferences: references?.length || 0,
+        responseRate: currentResponseRate,
+        avgProcessingTime: avgProcessingTime,
+        prevTotalApplications: prevApps.length,
+        prevActiveReferences: prevRefs.length,
+        prevResponseRate: prevResponseRate,
+        prevAvgProcessingTime: prevAvgProcessingTime
+      });
+
+      // Status distribution
+      const statusCounts = applications?.reduce((acc: any, app) => {
+        const status = app.status.charAt(0).toUpperCase() + app.status.slice(1);
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+      }, {});
+
+      const statusChartData = Object.entries(statusCounts || {}).map(([name, value]) => ({
+        name,
+        value
+      }));
+      setStatusData(statusChartData);
+
+      // Applications by role (top 5)
+      const roleCounts = applications?.reduce((acc: any, app) => {
+        acc[app.role] = (acc[app.role] || 0) + 1;
+        return acc;
+      }, {});
+
+      const roleChartData = Object.entries(roleCounts || {})
+        .map(([role, count]) => ({ role, count }))
+        .sort((a: any, b: any) => b.count - a.count)
+        .slice(0, 5);
+      setRoleData(roleChartData);
+
+      // Time series data (last 30 days)
+      const timeSeriesMap: any = {};
+      for (let i = 29; i >= 0; i--) {
+        const date = new Date(now);
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        timeSeriesMap[dateStr] = { date: dateStr, count: 0 };
+      }
+
+      recentApps.forEach(app => {
+        const dateStr = new Date(app.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        if (timeSeriesMap[dateStr]) {
+          timeSeriesMap[dateStr].count++;
+        }
+      });
+
+      setTimeSeriesData(Object.values(timeSeriesMap));
+
+      // Trend data (last 7 weeks - weekly aggregation)
+      const weeklyData: any = {};
+      for (let i = 6; i >= 0; i--) {
+        const weekStart = new Date(now);
+        weekStart.setDate(weekStart.getDate() - (i * 7));
+        const weekLabel = `Wk ${7 - i}`;
+        weeklyData[weekLabel] = { date: weekLabel, applications: 0, references: 0 };
+      }
+
+      applications?.forEach(app => {
+        const appDate = new Date(app.created_at);
+        const weeksDiff = Math.floor((now.getTime() - appDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
+        if (weeksDiff < 7) {
+          const weekLabel = `Wk ${7 - weeksDiff}`;
+          if (weeklyData[weekLabel]) {
+            weeklyData[weekLabel].applications++;
+          }
+        }
+      });
+
+      references?.forEach(ref => {
+        const refDate = new Date(ref.created_at);
+        const weeksDiff = Math.floor((now.getTime() - refDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
+        if (weeksDiff < 7) {
+          const weekLabel = `Wk ${7 - weeksDiff}`;
+          if (weeklyData[weekLabel]) {
+            weeklyData[weekLabel].references++;
+          }
+        }
+      });
+
+      setTrendData(Object.values(weeklyData));
+
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calculateChange = (current: number, previous: number) => {
+    if (previous === 0) return current > 0 ? '+100%' : '0%';
+    const change = ((current - previous) / previous) * 100;
+    return `${change >= 0 ? '+' : ''}${change.toFixed(1)}%`;
+  };
+
+  const getMetricCards = () => [
+    {
+      title: 'Total Applications',
+      value: metrics.totalApplications.toString(),
+      change: calculateChange(metrics.totalApplications, metrics.prevTotalApplications),
+      trend: metrics.totalApplications >= metrics.prevTotalApplications ? 'up' : 'down',
+      icon: FileText,
+      color: 'blue'
+    },
+    {
+      title: 'Active References',
+      value: metrics.activeReferences.toString(),
+      change: calculateChange(metrics.activeReferences, metrics.prevActiveReferences),
+      trend: metrics.activeReferences >= metrics.prevActiveReferences ? 'up' : 'down',
+      icon: Users,
+      color: 'green'
+    },
+    {
+      title: 'Response Rate',
+      value: `${metrics.responseRate.toFixed(1)}%`,
+      change: calculateChange(metrics.responseRate, metrics.prevResponseRate),
+      trend: metrics.responseRate >= metrics.prevResponseRate ? 'up' : 'down',
+      icon: TrendingUp,
+      color: 'purple'
+    },
+    {
+      title: 'Avg. Processing Time',
+      value: `${metrics.avgProcessingTime.toFixed(1)} days`,
+      change: calculateChange(metrics.prevAvgProcessingTime, metrics.avgProcessingTime), // Reversed: lower is better
+      trend: metrics.avgProcessingTime <= metrics.prevAvgProcessingTime ? 'up' : 'down',
+      icon: Activity,
+      color: 'indigo'
+    }
   ];
 
   const getColorClasses = (color: string) => {
@@ -163,20 +326,20 @@ export function AnalyticsDashboard() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
+          <p className="text-gray-600">Loading analytics...</p>
         </div>
       </div>
     );
   }
 
+  const metricCards = getMetricCards();
+
   return (
     <div className="min-h-screen bg-gray-50">
-      
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Key Metrics - Unchanged */}
+        {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {metrics.map((metric, index) => {
+          {metricCards.map((metric, index) => {
             const Icon = metric.icon;
             return (
               <div key={index} className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
@@ -195,23 +358,26 @@ export function AnalyticsDashboard() {
           })}
         </div>
 
-        {/* 4. NEW 2x2 CHART GRID */}
+        {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <TrendLineChart />
-            <HorizontalBarChart />
-            <StatusPieChart />
-            <SystemActivityAreaChart />
+          <TrendLineChart data={trendData} />
+          <HorizontalBarChart data={roleData} />
+          <StatusPieChart data={statusData} />
+          <SystemActivityAreaChart data={timeSeriesData} />
         </div>
 
-        {/* The Quick Actions and Recent Activity cards have been removed for a cleaner, chart-focused dashboard, 
-            but you can re-introduce them if you need more layout variety: */}
-        
-             {/* Additional Info Cards (Unchanged) */}
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-          {/* ... Quick Actions and Recent Activity cards remain here ... */}
+        {/* Additional Info Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
             <div className="space-y-3">
+              <button 
+                onClick={() => fetchAnalyticsData()}
+                className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors flex items-center justify-between"
+              >
+                <span className="text-gray-700">Refresh Dashboard</span>
+                <span className="text-blue-600">↻</span>
+              </button>
               <button className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors flex items-center justify-between">
                 <span className="text-gray-700">Export Dashboard Data</span>
                 <span className="text-blue-600">→</span>
@@ -220,48 +386,31 @@ export function AnalyticsDashboard() {
                 <span className="text-gray-700">Schedule Reports</span>
                 <span className="text-blue-600">→</span>
               </button>
-              <button className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors flex items-center justify-between">
-                <span className="text-gray-700">Configure Alerts</span>
-                <span className="text-blue-600">→</span>
-              </button>
             </div>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Activity</h3>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3 pb-3 border-b border-gray-100">
-                <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <Users className="h-4 w-4 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">New reference submitted</p>
-                  <p className="text-xs text-gray-500">2 minutes ago</p>
-                </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Summary</h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Total Applications</span>
+                <span className="font-bold text-gray-900">{metrics.totalApplications}</span>
               </div>
-              <div className="flex items-center space-x-3 pb-3 border-b border-gray-100">
-                <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <FileText className="h-4 w-4 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Application processed</p>
-                  <p className="text-xs text-gray-500">15 minutes ago</p>
-                </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Total References</span>
+                <span className="font-bold text-gray-900">{metrics.activeReferences}</span>
               </div>
-              <div className="flex items-center space-x-3">
-                <div className="h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center">
-                  <TrendingUp className="h-4 w-4 text-purple-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Response rate improved</p>
-                  <p className="text-xs text-gray-500">1 hour ago</p>
-                </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Response Rate</span>
+                <span className="font-bold text-gray-900">{metrics.responseRate.toFixed(1)}%</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Avg. Processing</span>
+                <span className="font-bold text-gray-900">{metrics.avgProcessingTime.toFixed(1)} days</span>
               </div>
             </div>
           </div>
         </div>
-       
-
       </div>
     </div>
   );
