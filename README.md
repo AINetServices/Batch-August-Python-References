@@ -1,44 +1,27 @@
 # Reference Checking System
-
 A comprehensive reference checking system built with React, TypeScript, Supabase, and Python with advanced AI capabilities using LangGraph multi-agents.
-
 ## Features
-
-- 🔐 **Complete Authentication System** - Sign in, sign out, and password reset with Supabase
-- 📄 **Resume Upload & Processing** - Drag-and-drop interface with AI-powered extraction
-- 🤖 **Multi-Agent AI Workflow** - LangGraph-based system for intelligent resume analysis
-- 👥 **Reference Extraction** - Automatically identify potential references from resumes
-- ❓ **Question Management** - Role-specific questions with human-in-the-loop approval
-- 📊 **Real-time Dashboard** - Track application status and manage references
+- 🔐 **Complete Authentication System** - Sign in, sign out, and password reset with Supabase ✅
+- 📄 **Resume Upload & Processing** - Drag-and-drop interface with AI-powered extraction ✅
+- 🤖 **Multi-Agent AI Workflow** - LangGraph-based system for intelligent resume analysis ✅
+- 👥 **Reference Extraction** - Automatically identify potential references from resumes ✅
+- ❓ **Question Management** - Role-specific questions with human-in-the-loop approval ✅
+- 📊 **Real-time Dashboard** - Track application status and manage references 
 - 🔍 **Advanced RAG System** - Vector-based semantic search and document analysis
-
-## Tech Stack
-
-### Frontend
-- **React 18** with TypeScript
-- **Tailwind CSS** for styling
-- **Supabase** for authentication and database
-- **Lucide React** for icons
-- **Vite** for development and building
-
-### Backend
-- **Python FastAPI** for API endpoints
-- **LangGraph** for multi-agent workflows
-- **LangChain** with Groq LLM integration
-- **ChromaDB** for vector storage
-- **Supabase** for database operations
-- **HuggingFace Embeddings** for semantic search
 
 ## Quick Start
 
-### Prerequisites
+### Prerequisites (make sure they are installed)
 - Node.js 18+ and npm
 - Python 3.9+
 - Supabase account
 - Groq API key
 
-### Frontend Setup
+## Setup
+1. There are 2 steps to setup this project
+The frontend and the backend
 
+### Frontend Setup
 1. Install dependencies:
 ```bash
 npm install
@@ -53,6 +36,7 @@ cp .env.example .env
 ```env
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+GROQ_API_KEY=your_groq_api_key
 ```
 
 4. Run the development server:
@@ -60,9 +44,16 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 npm run dev
 ```
 
-### Backend Setup
+5. The website will not work till backend is also setup, but ensure it you see something like this:
+```
+  VITE v5.4.8  ready in 195 ms
 
-1. Navigate to the Python backend:
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+```
+### Backend Setup
+1. Navigate to the Python backend in a terminal:
 ```bash
 cd python_backend
 ```
@@ -170,3 +161,22 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support
 
 For support, email your-email@example.com or create an issue in this repository.
+
+
+
+## Tech Stack
+
+### Frontend
+- **React 18** with TypeScript
+- **Tailwind CSS** for styling
+- **Supabase** for authentication and database
+- **Lucide React** for icons
+- **Vite** for development and building
+
+### Backend
+- **Python FastAPI** for API endpoints
+- **LangGraph** for multi-agent workflows
+- **LangChain** with Groq LLM integration
+- **ChromaDB** for vector storage
+- **Supabase** for database operations
+- **HuggingFace Embeddings** for semantic search
