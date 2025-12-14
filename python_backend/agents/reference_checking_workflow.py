@@ -49,7 +49,6 @@ class ReferenceCheckingWorkflow:
             model="llama-3.1-8b-instant",
             api_key=os.getenv("GROQ_API_KEY")
         )
-        print(os.getenv("GROQ_API_KEY"))
         self.embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en")
         
         # Initialize tools

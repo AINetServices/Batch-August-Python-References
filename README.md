@@ -9,17 +9,45 @@ A comprehensive reference checking system built with React, TypeScript, Supabase
 - 📊 **Real-time Dashboard** - Track application status and manage references 
 - 🔍 **Advanced RAG System** - Vector-based semantic search and document analysis
 
-## Quick Start
+## Quick Start (After setup)
 
-### Prerequisites (make sure they are installed)
+**If this is your first time, please skip this section and go to Prequisites and setup the app and environment**
+
+You are going to need two terminals for this app, one for the frontend and one for the backend
+
+1. First in a new terminal start backend using python
+```bash
+python python/python_backend/run.py
+```
+
+
+2. Second open a second terminal and run front end using npm
+```bash
+npm run dev
+```
+3. you will get a screen like this
+```
+VITE v5.4.8  ready in 195 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+```
+control and click to the local host link provided
+
+## Prerequisites (make sure they are installed)
 - Node.js 18+ and npm
 - Python 3.9+
 - Supabase account
 - Groq API key
+- Git 
 
 ## Setup
-1. There are 2 steps to setup this project
-The frontend and the backend
+Once you have prequisites ready and installed, setup the following
+Three Core functions required for this app to function:
+1. Frontend Setup
+2. Backend Setup
+3. Database Setup
 
 ### Frontend Setup
 1. Install dependencies:
