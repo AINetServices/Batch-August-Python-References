@@ -20,21 +20,32 @@ You are going to need two terminals for this app, one for the frontend and one f
 python python/python_backend/run.py
 ```
 
+``` example output
+INFO:     Started server process [19240]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+```
+
+***look for application startup complete thats when you know its ready***
 
 2. Second open a second terminal and run front end using npm
 ```bash
 npm run dev
 ```
-3. you will get a screen like this
-```
+Expected output: should be like this
+```example
 VITE v5.4.8  ready in 195 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
   ➜  press h + enter to show help
 ```
-control and click to the local host link provided
+***control and click to the local host link provided to start your app***
 
+### Keep in mind
+The above steps can be done in any order and simulataneously, the app will work regardless as long as you get both the example outputs that will indicate the app is ready to use.
+
+# Full setup (if first time)
 ## Prerequisites (make sure they are installed)
 - Node.js 18+ and npm
 - Python 3.9+
@@ -115,16 +126,180 @@ python run.py
 ```
 
 ### Database Setup
+**These steps might require some navigation. as steps and interfaces can change overtime**
+1. go to supabase.com
+2. Create an account > start an organization > start a project name it AINET (or anything)
+    Eventually a page should appear showing project overview
+3. On the left hand side toolbar go to **storage**
+4. Click new bucket or create bucket and call it ***resumes***
+6. For development purposes ensure "public bucket" is enabled and click create
+7. Next On the left-hand sidebar look for "SQL Editor" 
+    A text editor should show up
+4. Now you need to paste several scripts that will set up the database
+    - Paste the script into the editor window and click on the Run button (control + enter is also a shortcut)
+    - For every script ensure you use a new editor window to keep track of the scripts (this can be done creating a script tab at the top near the editor window usually a + icon)
+    - Ensure you do not get any error outputs, look for success, or No rows returned or anything similar when running otherwise try and debug.
 
-1. Run the Supabase migration to create the required tables:
-```sql
--- Execute the migration file in your Supabase SQL editor
--- File: supabase/migrations/create_reference_system.sql
+### Script #1 Core Tables
+Copy and Paste the following script into the text editor and 
 ```
 
-2. Enable Row Level Security (RLS) policies as defined in the migration.
+-- Applications table to store job applications and extracted resume data
+CREATE TABLE IF NOT EXISTS applications (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  resume_url text NOT NULL,
+  role text NOT NULL,
+  organization text NOT NULL,
+  extracted_data jsonb DEFAULT '{}',
+  status text DEFAULT 'processing' CHECK (status IN ('processing', 'extracted', 'approved', 'sent', 'completed')),
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+ 
+-- Questions table to store predefined questions by role and organization
+CREATE TABLE IF NOT EXISTS questions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  role text NOT NULL,
+  organization text NOT NULL,
+  questions jsonb NOT NULL,
+  created_at timestamptz DEFAULT now(),
+  UNIQUE(role, organization)
+);
 
-## Architecture
+-- References table to store reference contacts and their responses
+CREATE TABLE IF NOT EXISTS SOURCE_REFERENCES (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  application_id uuid REFERENCES applications(id) ON DELETE CASCADE NOT NULL,
+  name text NOT NULL,
+  email text NOT NULL,
+  company text NOT NULL,
+  relationship text NOT NULL,
+  years_worked text NOT NULL,
+  questions_sent jsonb DEFAULT '[]',
+  responses jsonb DEFAULT '{}',
+  status text DEFAULT 'pending' CHECK (status IN ('pending', 'sent', 'responded', 'overdue')),
+  created_at timestamptz DEFAULT now()
+);
+
+-- Enable Row Level Security
+ALTER TABLE applications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE questions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE SOURCE_REFERENCES ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for applications
+CREATE POLICY "Users can manage their own applications"
+  ON applications
+  FOR ALL
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+-- RLS Policies for questions (read-only for authenticated users)
+CREATE POLICY "Authenticated users can read questions"
+  ON questions
+  FOR SELECT
+  TO authenticated
+  USING (true);
+
+-- RLS Policies for references (access through applications)
+CREATE POLICY "Users can manage references for their applications"
+  ON SOURCE_REFERENCES
+  FOR ALL
+  TO authenticated
+  USING (
+    application_id IN (
+      SELECT id FROM applications WHERE user_id = auth.uid()
+    )
+  )
+  WITH CHECK (
+    application_id IN (
+      SELECT id FROM applications WHERE user_id = auth.uid()
+    )
+  );
+
+-- Function to update updated_at timestamp
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Trigger for applications table
+CREATE TRIGGER update_applications_updated_at 
+  BEFORE UPDATE ON applications 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Insert sample questions for common roles
+INSERT INTO questions (role, organization, questions) VALUES
+('Software Engineer', 'Tech Corp', '[
+  "How would you rate the candidate''s technical skills and coding abilities?",
+  "Can you describe a challenging project they worked on and how they handled it?",
+  "How did they collaborate with team members and handle feedback?",
+  "What are their strongest technical competencies?",
+  "Would you recommend them for a senior software engineering position?"
+]'),
+('Marketing Manager', 'Digital Agency', '[
+  "How would you evaluate their campaign management and strategic thinking?",
+  "Can you provide examples of successful marketing initiatives they led?",
+  "How did they handle budget management and ROI optimization?",
+  "What are their strengths in team leadership and client relations?",
+  "Would you hire them again for a marketing leadership role?"
+]'),
+('Data Scientist', 'Analytics Inc', '[
+  "How would you assess their analytical and statistical modeling skills?",
+  "Can you describe their experience with machine learning projects?",
+  "How did they communicate complex findings to non-technical stakeholders?",
+  "What programming languages and tools did they excel at?",
+  "Would you recommend them for a senior data science position?"
+]');
+
+```
+    ***Expected output for this is: Success No Rows Returned***
+
+### Script Number #2 Authentication policies
+```
+
+-- Allow authenticated users to upload files
+CREATE POLICY "Allow authenticated upload to resumes"
+ON storage.objects
+FOR INSERT
+TO authenticated
+WITH CHECK (bucket_id = 'resumes');
+
+-- Allow authenticated users to read files  
+CREATE POLICY "Allow authenticated read from resumes"
+ON storage.objects
+FOR SELECT
+TO authenticated
+USING (bucket_id = 'resumes');
+
+-- Allow authenticated users to update files
+CREATE POLICY "Allow authenticated update to resumes"
+ON storage.objects
+FOR UPDATE
+TO authenticated
+USING (bucket_id = 'resumes');
+
+-- Allow authenticated users to delete files
+CREATE POLICY "Allow authenticated delete from resumes"
+ON storage.objects
+FOR DELETE
+TO authenticated
+USING (bucket_id = 'resumes');
+
+```
+
+
+### Script Number #2 Authentication policies
+```
+
+
+
+```
+# Architecture
 
 ### Multi-Agent Workflow
 
