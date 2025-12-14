@@ -13,4 +13,3 @@ PyPDF2
 python-docx
 supabase
 sentence-transformers
-recharts
