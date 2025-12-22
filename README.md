@@ -1,12 +1,15 @@
 # Reference Checking System
+
 A comprehensive reference checking system built with React, TypeScript, Supabase, and Python with advanced AI capabilities using LangGraph multi-agents.
+
 ## Features
+
 - 🔐 **Complete Authentication System** - Sign in, sign out, and password reset with Supabase ✅
 - 📄 **Resume Upload & Processing** - Drag-and-drop interface with AI-powered extraction ✅
 - 🤖 **Multi-Agent AI Workflow** - LangGraph-based system for intelligent resume analysis ✅
 - 👥 **Reference Extraction** - Automatically identify potential references from resumes ✅
 - ❓ **Question Management** - Role-specific questions with human-in-the-loop approval ✅
-- 📊 **Real-time Dashboard** - Track application status and manage references 
+- 📊 **Real-time Dashboard** - Track application status and manage references
 - 🔍 **Advanced RAG System** - Vector-based semantic search and document analysis
 
 ## Quick Start (After setup)
@@ -16,23 +19,27 @@ A comprehensive reference checking system built with React, TypeScript, Supabase
 You are going to need two terminals for this app, one for the frontend and one for the backend
 
 1. First in a new terminal start backend using python
+
 ```bash
 python python/python_backend/run.py
 ```
 
-``` example output
+```example output
 INFO:     Started server process [19240]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 ```
 
-***look for application startup complete thats when you know its ready***
+**_look for application startup complete thats when you know its ready_**
 
 2. Second open a second terminal and run front end using npm
+
 ```bash
 npm run dev
 ```
+
 Expected output: should be like this
+
 ```example
 VITE v5.4.8  ready in 195 ms
 
@@ -40,38 +47,48 @@ VITE v5.4.8  ready in 195 ms
   ➜  Network: use --host to expose
   ➜  press h + enter to show help
 ```
-***control and click to the local host link provided to start your app***
+
+**_control and click to the local host link provided to start your app_**
 
 ### Keep in mind
+
 The above steps can be done in any order and simulataneously, the app will work regardless as long as you get both the example outputs that will indicate the app is ready to use.
 
 # Full setup (if first time)
+
 ## Prerequisites (make sure they are installed)
+
 - Node.js 18+ and npm
-- Python 3.9+
+- Python 3.9+ (DO NOT USE LATEST PYTHON <3.14 NOT COMPATIABLE)
 - Supabase account
 - Groq API key
-- Git 
+- Git
 
 ## Setup
+
 Once you have prequisites ready and installed, setup the following
 Three Core functions required for this app to function:
+
 1. Frontend Setup
 2. Backend Setup
 3. Database Setup
 
 ### Frontend Setup
+
 1. Install dependencies:
+
 ```bash
 npm install
 ```
 
 2. Set up environment variables:
+
 ```bash
 cp .env.example .env
 ```
 
 3. Update `.env` with your Supabase credentials:
+
 ```env
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -79,11 +96,13 @@ GROQ_API_KEY=your_groq_api_key
 ```
 
 4. Run the development server:
+
 ```bash
 npm run dev
 ```
 
 5. The website will not work till backend is also setup, but ensure it you see something like this:
+
 ```
   VITE v5.4.8  ready in 195 ms
 
@@ -91,29 +110,38 @@ npm run dev
   ➜  Network: use --host to expose
   ➜  press h + enter to show help
 ```
+
 ### Backend Setup
+
 1. Navigate to the Python backend in a terminal:
+
 ```bash
 cd python_backend
 ```
 
 2. Create a virtual environment:
+
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 3. Install Python dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
+**_Note this might take a long time_**
+
 4. Set up environment variables:
+
 ```bash
 cp .env.example .env
 ```
 
 5. Update `python_backend/.env` with your credentials:
+
 ```env
 GROQ_API_KEY=your_groq_api_key
 SUPABASE_URL=your_supabase_url
@@ -121,27 +149,34 @@ SUPABASE_SERVICE_KEY=your_supabase_service_key
 ```
 
 6. Run the Python backend:
+
 ```bash
 python run.py
 ```
 
 ### Database Setup
+
+#### In order to setup the database first we must run the program and create a user
+
 **These steps might require some navigation. as steps and interfaces can change overtime**
+
 1. go to supabase.com
 2. Create an account > start an organization > start a project name it AINET (or anything)
-    Eventually a page should appear showing project overview
+   Eventually a page should appear showing project overview
 3. On the left hand side toolbar go to **storage**
-4. Click new bucket or create bucket and call it ***resumes***
-6. For development purposes ensure "public bucket" is enabled and click create
-7. Next On the left-hand sidebar look for "SQL Editor" 
-    A text editor should show up
-4. Now you need to paste several scripts that will set up the database
-    - Paste the script into the editor window and click on the Run button (control + enter is also a shortcut)
-    - For every script ensure you use a new editor window to keep track of the scripts (this can be done creating a script tab at the top near the editor window usually a + icon)
-    - Ensure you do not get any error outputs, look for success, or No rows returned or anything similar when running otherwise try and debug.
+4. Click new bucket or create bucket and call it **_resumes_**
+5. For development purposes ensure "public bucket" is enabled and click create
+6. Next On the left-hand sidebar look for "SQL Editor"
+   A text editor should show up
+7. Now you need to paste several scripts that will set up the database
+   - Paste the script into the editor window and click on the Run button (control + enter is also a shortcut)
+   - For every script ensure you use a new editor window to keep track of the scripts (this can be done creating a script tab at the top near the editor window usually a + icon)
+   - Ensure you do not get any error outputs, look for success, or No rows returned or anything similar when running otherwise try and debug.
 
 ### Script #1 Core Tables
-Copy and Paste the following script into the text editor and 
+
+Copy and Paste the following script into the text editor and
+
 ```
 
 -- Applications table to store job applications and extracted resume data
@@ -156,7 +191,7 @@ CREATE TABLE IF NOT EXISTS applications (
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
- 
+
 -- Questions table to store predefined questions by role and organization
 CREATE TABLE IF NOT EXISTS questions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -228,8 +263,8 @@ END;
 $$ language 'plpgsql';
 
 -- Trigger for applications table
-CREATE TRIGGER update_applications_updated_at 
-  BEFORE UPDATE ON applications 
+CREATE TRIGGER update_applications_updated_at
+  BEFORE UPDATE ON applications
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Insert sample questions for common roles
@@ -257,9 +292,11 @@ INSERT INTO questions (role, organization, questions) VALUES
 ]');
 
 ```
+
     ***Expected output for this is: Success No Rows Returned***
 
 ### Script Number #2 Authentication policies
+
 ```
 
 -- Allow authenticated users to upload files
@@ -269,7 +306,7 @@ FOR INSERT
 TO authenticated
 WITH CHECK (bucket_id = 'resumes');
 
--- Allow authenticated users to read files  
+-- Allow authenticated users to read files
 CREATE POLICY "Allow authenticated read from resumes"
 ON storage.objects
 FOR SELECT
@@ -292,13 +329,14 @@ USING (bucket_id = 'resumes');
 
 ```
 
-
 ### Script Number #2 Authentication policies
-```
-
-
 
 ```
+
+
+
+```
+
 # Architecture
 
 ### Multi-Agent Workflow
@@ -330,6 +368,7 @@ The system uses LangGraph to orchestrate a multi-agent workflow:
 ## Database Schema
 
 ### Tables
+
 - **applications** - Job applications with extracted data
 - **questions** - Predefined questions by role and organization
 - **references** - Reference contacts and their responses
@@ -345,12 +384,14 @@ The system uses LangGraph to orchestrate a multi-agent workflow:
 ## Environment Variables
 
 ### Frontend (.env)
+
 ```env
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 ### Backend (python_backend/.env)
+
 ```env
 GROQ_API_KEY=your_groq_api_key
 SUPABASE_URL=your_supabase_url
@@ -365,11 +406,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For support, email your-email@example.com or create an issue in this repository.
 
-
-
 ## Tech Stack
 
 ### Frontend
+
 - **React 18** with TypeScript
 - **Tailwind CSS** for styling
 - **Supabase** for authentication and database
@@ -377,6 +417,7 @@ For support, email your-email@example.com or create an issue in this repository.
 - **Vite** for development and building
 
 ### Backend
+
 - **Python FastAPI** for API endpoints
 - **LangGraph** for multi-agent workflows
 - **LangChain** with Groq LLM integration
